@@ -1,0 +1,9 @@
+# pencils.buzz and www get a certificate once the A record points here.
+# The bare IP stays on HTTP until that DNS change is live.
+pencils.buzz, www.pencils.buzz {
+	reverse_proxy 127.0.0.1:8787
+}
+
+http://18.234.130.106 {
+	reverse_proxy 127.0.0.1:8787
+}

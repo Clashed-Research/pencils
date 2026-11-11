@@ -1,0 +1,22 @@
+[Unit]
+Description=Pencils
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/pencils
+Environment=PORT=8787
+Environment=HOST=127.0.0.1
+Environment=PENCILS_DATA=/var/lib/pencils/pencils.sqlite
+Environment=NODE_ENV=production
+Environment=SWARM_MS=8000
+Environment=PENCILS_CONTRACT=pencilsbuzz.testnet
+EnvironmentFile=-/etc/pencils.env
+ExecStart=/usr/local/bin/node --disable-warning=ExperimentalWarning server/index.mjs
+Restart=always
+RestartSec=2
+User=pencils
+Group=pencils
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

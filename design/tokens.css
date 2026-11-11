@@ -1,0 +1,60 @@
+/* Pencils design tokens. Light is the default and the brand look.
+   Dark values exist for the app only; the homepage is always white. */
+:root{
+  /* surfaces and ink */
+  --bg:#ffffff;        /* page */
+  --ink:#000000;       /* primary text, dark buttons */
+  --ink2:#2b2b31;      /* body text */
+  --muted:#6e6e78;     /* secondary text */
+  --faint:#a9a9b3;     /* tertiary text, inactive icons */
+  --line:#ebebef;      /* hairlines, borders */
+  --soft:#f4f5f7;      /* inputs, chips, quiet buttons */
+  --soft2:#eceef2;     /* tracks, toggles off */
+
+  /* the two sides of every market */
+  --yes:#2b3cff;  --yes-soft:#eceeff;  --yes-ink:#1a27c9;   /* cobalt */
+  --no:#ff2e88;   --no-soft:#ffeaf3;   --no-ink:#d1126a;    /* magenta */
+
+  /* accents */
+  --mark:#dfe2ff;      /* highlighter under the key number in a thesis */
+  --good:#0f9d63;      /* gains, live dot, passed checks */
+  --bad:#e0245e;       /* losses, odds falling */
+
+  /* pencil materials (logo and 3D scene) */
+  --pencil-wood:#f0cfa0; --pencil-lead:#2a2a2e; --pencil-ferrule:#c9ccd6; --pencil-eraser:#ff9eb8; --pencil-pale:#dfe1e8;
+
+  /* type */
+  --serif:'Instrument Serif','Iowan Old Style',Georgia,serif;          /* theses, headlines, summaries */
+  --sans:'Geist',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;  /* UI, numbers (tabular) */
+
+  /* radii */
+  --r-xs:6px;   /* side chips (Yes / No) */
+  --r-sm:9px;   /* range tabs, small buttons */
+  --r-md:12px;  /* quick bet buttons, inputs */
+  --r-lg:14px;  /* standard buttons */
+  --r-xl:18px;  /* large trade buttons, panels */
+  --r-2xl:22px; /* agent cards, summary card */
+  --r-3xl:26px; /* sheets, modals */
+  --r-pill:999px;
+
+  /* layout */
+  --nav:68px;            /* mobile bottom nav height */
+  --topbar:58px;         /* mobile top bar */
+  --sidebar:248px;       /* desktop left sidebar */
+  --rail:330px;          /* desktop right rail, from 1360px */
+  --gutter-m:18px;       /* mobile side padding */
+  --gutter-d:32px;       /* desktop side padding */
+  --app-max-mobile:520px;
+  --market-max:1180px;
+
+  /* motion */
+  --ease-out:cubic-bezier(.2,.8,.2,1);
+  --ease-curtain:cubic-bezier(.7,0,.25,1);
+  --t-fast:.12s; --t-base:.28s; --t-sheet:.32s; --t-screen:.34s;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c0c10;--ink:#ffffff;--ink2:#dedee4;--muted:#9a9aa6;--faint:#5e5e68;--line:#22222a;--soft:#16161c;--soft2:#1e1e26;
+    --yes:#6b78ff;--yes-soft:#1a1d3d;--yes-ink:#a9b0ff;--no:#ff5aa2;--no-soft:#3a1426;--no-ink:#ff9cc7;--mark:#262a5c;
+  }
+}

@@ -1,0 +1,7 @@
+[package]
+name = "pencils-market"
+version = "0.1.0"
+edition = "2021"
+description = "Pencils CPMM and resolution rules. No chain SDK, so tests run everywhere."
+
+[dependencies]

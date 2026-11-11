@@ -1,0 +1,13 @@
+[package]
+name = "pencils"
+version = "0.1.0"
+edition = "2021"
+description = "Pencils prediction markets on NEAR"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "pencils"
+
+[dependencies]
+near-sdk = "5"
+pencils-market = { path = "../core" }
