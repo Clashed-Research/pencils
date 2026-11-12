@@ -1,78 +1,98 @@
-// External Pencils agent. It uses the operator's Gemini key and public X pages.
-// Pencils' NEAR AI key is not read and is not called.
+// External Pencils agent. Once an hour it reads the X API, asks Grok with X search
+// which narrative is hot, and lists a narrative market plus a thesis market.
+// The operator pays for X_BEARER_TOKEN and XAI_API_KEY. Pencils' NEAR AI key is not read.
 
-import { parseDraft } from "../server/agents.mjs";
-import { postsFromX } from "../server/feeds.mjs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { listingNote, runHour, sleep } from "./cycle.mjs";
+import { askGrok, DEFAULT_MODEL } from "./grok.mjs";
+import { chooseListings, HOUR_MS, parseNarrative, postsFromXApi, trendQuery, xPrompt } from "./narratives.mjs";
 
 const site = (process.env.PENCILS_URL || "https://pencils.buzz").replace(/\/$/, "");
 const token = process.env.PENCILS_AGENT_TOKEN || "";
-const geminiKey = process.env.GEMINI_API_KEY || "";
-const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
-const handle = (process.env.X_HANDLES || "NEARProtocol").split(",")[0].trim();
+const xKey = process.env.X_BEARER_TOKEN || "";
+const grokKey = process.env.XAI_API_KEY || "";
+const model = process.env.XAI_MODEL || DEFAULT_MODEL;
+const once = process.env.AGENT_ONCE === "1";
+const interval = Math.max(60_000, Number(process.env.AGENT_INTERVAL_MS || HOUR_MS) || HOUR_MS);
+const seenPath = path.join(path.dirname(fileURLToPath(import.meta.url)), ".seen.json");
+
+function woeid() {
+  const raw = String(process.env.X_TRENDS_WOEID || "1").trim();
+  return /^[1-9]\d{0,8}$/.test(raw) ? raw : "1";
+}
 
 if (!token.startsWith("pk_")) {
-  console.error("Set PENCILS_AGENT_TOKEN from the Pencils plug-in sheet.");
+  console.error("Set PENCILS_AGENT_TOKEN from the Pencils plug-in sheet. Use a different token from the public agent.");
   process.exit(1);
 }
-if (!geminiKey) {
-  console.error("Set GEMINI_API_KEY. Pencils does not spend its NEAR AI key on a plugged-in agent.");
+if (!xKey) {
+  console.error("Set X_BEARER_TOKEN. This agent reads the X API. It is not pinned to an account.");
   process.exit(1);
 }
-if (!/^[A-Za-z0-9_]{1,15}$/.test(handle)) {
-  console.error("X handle is not valid");
+if (!grokKey) {
+  console.error("Set XAI_API_KEY. Pencils does not spend its NEAR AI key on a plugged-in agent.");
   process.exit(1);
 }
 
-const page = await fetch(`https://r.jina.ai/https://x.com/${handle}`, {
-  headers: { accept: "text/plain", "user-agent": "pencils-agent/1.0" },
-  signal: AbortSignal.timeout(20_000),
-});
-if (!page.ok) throw new Error(`X feed ${page.status}`);
-const posts = postsFromX(handle, await page.text());
-const post = posts[0];
-if (!post) {
-  console.log(`No usable post from @${handle}`);
-  process.exit(0);
+function dayStamp(ms) {
+  return new Date(ms).toISOString().slice(0, 10);
 }
 
-const draftRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-  method: "POST",
-  headers: { "content-type": "application/json", "x-goog-api-key": geminiKey },
-  body: JSON.stringify({
-    generationConfig: { temperature: 0.2, maxOutputTokens: 300, responseMimeType: "application/json" },
-    contents: [
-      {
-        role: "user",
-        parts: [
-          {
-            text: `You write one sentence a person can check at this X page. Reply with JSON only: {"title":"...","days":7}. days is 1, 7, or 30. The title is 40 to 160 characters and includes a number, a deadline, and the record the post itself names. Do not invent a different source.\nPost: ${post.text}\nPage: ${post.url}`,
-          },
-        ],
-      },
-    ],
-  }),
-  signal: AbortSignal.timeout(30_000),
-});
-if (!draftRes.ok) {
-  const body = await draftRes.text();
-  throw new Error(`Gemini ${draftRes.status}: ${body.slice(0, 180)}`);
+async function xJson(url) {
+  const res = await fetch(url, {
+    headers: { authorization: `Bearer ${xKey}`, accept: "application/json" },
+    signal: AbortSignal.timeout(20_000),
+  });
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`X API ${res.status}: ${body.slice(0, 160)}`);
+  }
+  return res.json();
 }
-const gemini = await draftRes.json();
-const text = (gemini.candidates?.[0]?.content?.parts || []).map((part) => part.text || "").join("");
-const draft = parseDraft(text);
-if (!draft) throw new Error("Gemini did not return a thesis");
 
-const published = await fetch(`${site}/api/agent/markets`, {
-  method: "POST",
-  headers: { "content-type": "application/json", authorization: `Bearer ${token}` },
-  body: JSON.stringify({
-    title: draft.title,
-    days: draft.days,
-    sourceUrl: post.url,
-    sourceLabel: `X: @${handle}`,
-  }),
-  signal: AbortSignal.timeout(20_000),
-});
-const result = await published.json().catch(() => ({}));
-if (!published.ok) throw new Error(result.error || `Pencils ${published.status}`);
-console.log(`Listed ${result.marketId} from @${handle} on ${site}`);
+async function loadPosts() {
+  const trends = await xJson(
+    `https://api.x.com/2/trends/by/woeid/${woeid()}?max_trends=10&trend.fields=trend_name,tweet_count`,
+  );
+  const picked = postsFromXApi(trends, null);
+  const query = trendQuery(picked.trend?.name);
+  if (!query) return [];
+  const params = new URLSearchParams({
+    query,
+    max_results: "10",
+    "tweet.fields": "created_at,public_metrics,lang",
+    expansions: "author_id",
+    "user.fields": "username",
+  });
+  const search = await xJson(`https://api.x.com/2/tweets/search/recent?${params}`);
+  return postsFromXApi(trends, search).posts;
+}
+
+async function gather(slots) {
+  const posts = await loadPosts();
+  if (!posts.length) throw new Error("No usable X posts this hour");
+  const today = Date.now();
+  const { text } = await askGrok({
+    key: grokKey,
+    model,
+    prompt: xPrompt(posts),
+    tools: [{ type: "x_search", from_date: dayStamp(today - 86_400_000), to_date: dayStamp(today) }],
+  });
+  const parsed = parseNarrative(text, posts);
+  if (!parsed) throw new Error("Grok did not return a narrative bound to an X post");
+  const listings = chooseListings(parsed, slots);
+  if (!listings.length) throw new Error("No distinct market came back");
+  return { listings, site, token, note: listingNote(parsed, slots, listings) };
+}
+
+console.log(`Hourly X agent reading the X API and asking Grok every ${Math.round(interval / 60000)} min`);
+if (once) {
+  await runHour(seenPath, interval, gather);
+} else {
+  for (;;) {
+    const wait = await runHour(seenPath, interval, gather);
+    if (wait > 0) console.log(`Next narrative check in ${Math.ceil(wait / 60000)} min`);
+    await sleep(wait || interval);
+  }
+}

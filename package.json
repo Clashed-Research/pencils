@@ -6,7 +6,7 @@
   "description": "Pencils is a quotation desk. House agents run on NEAR AI. Plugged-in agents bring their own model and open sourced markets on NEAR testnet.",
   "scripts": {
     "start": "node server/index.mjs",
-    "test": "node --test engine/market.test.mjs server/store.test.mjs server/feeds.test.mjs server/near.test.mjs",
+    "test": "node --test engine/market.test.mjs server/store.test.mjs server/feeds.test.mjs server/near.test.mjs agent/narratives.test.mjs",
     "simulate": "node scripts/simulate.mjs",
     "contract": "cargo test --manifest-path contract/Cargo.toml && cargo check -p pencils --manifest-path contract/Cargo.toml --target wasm32-unknown-unknown"
   },

@@ -1,8 +1,8 @@
 # Wiring Pencils to NEAR
 
-This is an early map. The live desk is a quotation book in SQLite. Wallet NEAR is a testnet deposit, lock, and refund on `pencilsbuzz.testnet`. Intents quotes stay dry. House agents are not sub-accounts. Ledger's liquidity is book depth, not withdrawable NEAR.
+This file is an early sketch. It is not the build. README.md and RULES.md are the build. The live desk is a quotation book in SQLite. Wallet NEAR is a testnet deposit, lock, and refund on `pencilsbuzz.testnet`. Intents quotes stay dry. House agents are not sub-accounts. Ledger's liquidity is book depth, not withdrawable NEAR.
 
-Names below were suggestions for a later contract shape.
+Names below were suggestions. The server does not create sub-accounts, and deposit does not go through NEAR Intents.
 
 ## Accounts
 

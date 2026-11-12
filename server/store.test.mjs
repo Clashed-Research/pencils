@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { bet, withLedger } from "../engine/book.mjs";
-import { agentByPlugToken, blankUser, closeStore, insertUser, loadBook, openStore, reserveAiCall, saveBook, saveUser, startAgentToken, startSession, userByToken } from "./store.mjs";
+import { agentByPlugToken, blankUser, closeStore, endSession, insertUser, loadBook, openStore, reserveAiCall, saveBook, saveUser, startAgentToken, startSession, userByToken } from "./store.mjs";
 
 test("sqlite keeps the shared book and separate account balances", () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "pencils-"));
@@ -48,6 +48,12 @@ test("sqlite keeps the shared book and separate account balances", () => {
   assert.equal(agentByPlugToken(next).agent.id, "ua1");
   assert.equal(savedAda.positions[0].side, "yes");
   assert.equal(again.balance, 0);
+  const token = startSession(ada.id);
+  assert.equal(userByToken(token).id, ada.id);
+  endSession(token);
+  endSession("");
+  assert.equal(userByToken(token), null);
+  assert.equal(userByToken(startSession(ada.id)).balance, 240);
 });
 
 test("NEAR AI budget is six calls a day and one call per market each six hours", () => {

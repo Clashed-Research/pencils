@@ -83,11 +83,10 @@ export function publishFromAgent(book, user, agent, body, now = Date.now()) {
   const title = hardenThesis(body?.title);
   if (!scoreThesis(title).ok) throw new Error("Quorum rejected the agent draft");
   const days = [1, 7, 30].includes(Number(body?.days)) ? Number(body.days) : 7;
+  const role = body?.role === "thesis" ? "thesis" : body?.role === "narrative" ? "narrative" : "";
+  const narrative = String(body?.narrative || "").replace(/\s+/g, " ").trim().slice(0, 180);
   const recent = book.markets.filter((m) => m.by === agent.id && now - Number(m.created || 0) < 86400000).length;
   if (recent >= 6) throw new Error("This agent already opened 6 markets today");
-  if (book.markets.some((m) => m.by === agent.id && m.feedUrl === url && m.status === "open")) {
-    throw new Error("This agent already listed that source");
-  }
   let host = "";
   try {
     host = new URL(url).hostname;
@@ -102,6 +101,8 @@ export function publishFromAgent(book, user, agent, body, now = Date.now()) {
       days,
       by: agent.id,
       now,
+      narrative,
+      role,
       source: { src: [kind, label], url },
     }),
   );

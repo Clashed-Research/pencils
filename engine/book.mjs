@@ -1,3 +1,4 @@
+import { repeatsClaim } from "./claims.mjs";
 import { addBoth, applyBuy, commitPool, freshPool, leanQuote, microToUsd, seedTo, spot, usdToMicro } from "./math.mjs";
 import { DRAFTS, RESOLVED, seedMarkets, SYSTEM } from "./seed.mjs";
 
@@ -51,6 +52,10 @@ function attachPool(m) {
   m.proposedAt = null;
   m.evidence = "";
   m.coalitionShares = {};
+  m.feeAgent = "0";
+  m.feePencils = "0";
+  if (!m.narrative) m.narrative = "";
+  if (!m.role) m.role = "";
   if (!m.ct) m.ct = null;
   return m;
 }
@@ -109,6 +114,7 @@ export function createState(now = Date.now()) {
     banks,
     drafts: DRAFTS.map((d) => ({ ...d })),
     userMarketSeq: 0,
+    fees: { pencils: "0", byAgent: {} },
   };
 }
 
@@ -201,6 +207,37 @@ function round2(n) {
   return Math.round(n * 100) / 100;
 }
 
+function microString(value) {
+  try {
+    const n = BigInt(value ?? "0");
+    return n < 0n ? "0" : n.toString();
+  } catch {
+    return "0";
+  }
+}
+
+function feeBook(state) {
+  const prev = state.fees && typeof state.fees === "object" ? state.fees : {};
+  const byAgent = prev.byAgent && typeof prev.byAgent === "object" ? prev.byAgent : {};
+  state.fees = { pencils: microString(prev.pencils), byAgent };
+  return state.fees;
+}
+
+// A fill's fee is book credit: half for the agent that listed the market, half for Pencils.
+// It is not added to a balance, so it cannot be refunded as NEAR. finalize pays a coalition
+// only the pool fees this split did not claim (seed quotes and two-sided liquidity).
+function creditTradeFee(state, m, feeMicro) {
+  if (feeMicro <= 0n) return;
+  const agentPart = feeMicro / 2n;
+  const pencilsPart = feeMicro - agentPart;
+  m.feeAgent = (BigInt(microString(m.feeAgent)) + agentPart).toString();
+  m.feePencils = (BigInt(microString(m.feePencils)) + pencilsPart).toString();
+  const fees = feeBook(state);
+  const who = m.by || "unknown";
+  fees.byAgent[who] = (BigInt(microString(fees.byAgent[who])) + agentPart).toString();
+  fees.pencils = (BigInt(fees.pencils) + pencilsPart).toString();
+}
+
 function tradeInto(state, m, side, usd, who, now, { position = true, coalition = false, limit = true, near = false, prepaid = false } = {}) {
   if (m.status !== "open") throw new Error("Market is not open");
   if (m.ends <= now) throw new Error("Market is closed");
@@ -250,6 +287,7 @@ function tradeInto(state, m, side, usd, who, now, { position = true, coalition =
     if (row) row[1] = round2(row[1] + usd);
     else m.co.push([who, round2(usd)]);
   }
+  creditTradeFee(state, m, next.fee);
   return { shares, price: side === "yes" ? priceBefore : 1 - priceBefore, p: m.p, fee: microToUsd(next.fee) };
 }
 
@@ -458,7 +496,7 @@ export function scoreThesis(text) {
   return { checks, score: checks.filter((c) => c.ok).length, ok: checks.filter((c) => c.ok).length >= 3 };
 }
 
-export function propose(state, { title, days = 7, by, now = Date.now(), source }) {
+export function propose(state, { title, days = 7, by, now = Date.now(), source, narrative = "", role = "" }) {
   const v = String(title || "").trim();
   const scored = scoreThesis(v);
   if (!scored.ok) throw new Error("Quorum rejected this thesis. It needs a number, a deadline, and a source.");
@@ -472,6 +510,10 @@ export function propose(state, { title, days = 7, by, now = Date.now(), source }
   const label = String(source?.src?.[1] || "").replace(/\s+/g, " ").trim().slice(0, 90);
   const url = safeHttpUrl(source?.url);
   const where = label || "the public source named in the thesis";
+  const cleanRole = role === "narrative" || role === "thesis" ? role : "";
+  const line = String(narrative || "").replace(/\s+/g, " ").replaceAll("{p}", "").trim().slice(0, 160);
+  const repeat = (state.markets || []).find((existing) => repeatsClaim(plain(existing.t), existing.narrative, v, line));
+  if (repeat) throw new Error("That repeats a market already on the book");
   const m = attachPool({
     id,
     t,
@@ -484,15 +526,20 @@ export function propose(state, { title, days = 7, by, now = Date.now(), source }
     co: [[by, 0]],
     traders: 1,
     created: now,
-    sum: "Just listed at {p}%. Agents are gathering signals and the first trades will set the price.",
+    narrative: line,
+    role: cleanRole,
+    sum: line
+      ? `${line} Desk quote {p}%.`
+      : "Just listed at {p}%. Agents are gathering signals and the first trades will set the price.",
     crit: `Resolves Yes if this claim is true by the deadline. Quorum checks ${where}${url ? ` (${url})` : ""}. The trade price is not the result.`,
     ct: null,
   });
   m.hist = m.hist.map(() => m.p);
   state.markets.push(m);
   const who = agentName(state, by);
+  const listed = cleanRole === "narrative" ? "a narrative market" : cleanRole === "thesis" ? "a thesis market" : "a market";
   pushEvent(state, `<b>${esc(who)}</b> proposed “${esc(short(t))}”`, now);
-  recordActivity(state, { kind: "launched", agentId: by, name: who, marketId: id, text: `${who} launched “${short(t)}”`, now });
+  recordActivity(state, { kind: "launched", agentId: by, name: who, marketId: id, text: `${who} launched ${listed}`, now });
   if (url) {
     recordActivity(state, {
       kind: "approved",
@@ -612,7 +659,9 @@ export function finalize(state, { marketId, now = Date.now() }) {
   const win = m.outcome;
   const ledgers = state.ledgers?.length ? state.ledgers : [state];
   for (const ledger of ledgers) payLedger(ledger, m, win, now);
-  const feeUsd = microToUsd(pool.fees);
+  const allocated = BigInt(microString(m.feeAgent)) + BigInt(microString(m.feePencils));
+  const leftover = pool.fees > allocated ? pool.fees - allocated : 0n;
+  const feeUsd = microToUsd(leftover);
   const stakers = Object.entries(m.coalitionShares || {}).filter(([, v]) => v.usd > 0);
   const stakeSum = stakers.reduce((s, [, v]) => s + v.usd, 0);
   if (win === "yes" && stakeSum > 0 && feeUsd > 0) {
@@ -726,6 +775,10 @@ export function clientView(state, now = Date.now()) {
       evidence: m.evidence,
       feedUrl: m.feedUrl || "",
       awaitingSource: !!m.awaitingSource,
+      narrative: m.narrative || "",
+      role: m.role || "",
+      feeAgent: microToUsd(BigInt(microString(m.feeAgent))),
+      feePencils: microToUsd(BigInt(microString(m.feePencils))),
     })),
     feeds: (state.feeds || []).slice(0, 8),
     events: state.events,
@@ -733,7 +786,7 @@ export function clientView(state, now = Date.now()) {
     resolved: state.resolved || [],
     near: {
       network: process.env.NEAR_NETWORK || "testnet",
-      contract: process.env.PENCILS_CONTRACT || "pencils.testnet",
+      contract: process.env.PENCILS_CONTRACT || "pencilsbuzz.testnet",
       parent: state.accountId || "",
       agents: Object.values(SYSTEM).map((a) => a.handle),
       intents: "dry",
@@ -741,6 +794,12 @@ export function clientView(state, now = Date.now()) {
       mode: "testnet-near",
     },
     banks: state.banks,
+    fees: (() => {
+      const fees = feeBook(state);
+      const byAgent = {};
+      for (const [id, micro] of Object.entries(fees.byAgent)) byAgent[id] = microToUsd(BigInt(microString(micro)));
+      return { pencils: microToUsd(BigInt(fees.pencils)), byAgent };
+    })(),
   };
 }
 

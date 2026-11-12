@@ -5,6 +5,8 @@ data/
 *.sqlite-shm
 contract/target/
 .env
+.env.txt
 agent/.seen.json
+agent/.seen-public.json
 *.log
 .DS_Store

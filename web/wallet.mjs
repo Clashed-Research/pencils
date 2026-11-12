@@ -29,7 +29,7 @@ function explain(err) {
   const tags = Array.isArray(reason?.endTags) ? reason.endTags.join(" ") : "";
   const message = (err && err.message) || reason?.message || "Meteor could not connect";
   if (/cancel/i.test(message) || /USER_CANCELLED|WINDOW_CLOSED/.test(tags)) {
-    return new Error("Meteor was closed before it finished. Open it again and approve the testnet account.");
+    return new Error("Meteor closed before it finished. Leave its window open, choose the extension, and approve the testnet account. Allow popups for pencils.buzz if the browser blocked it.");
   }
   if (/NO_ACCOUNTS/.test(tags) || /no current account/i.test(message)) {
     return new Error("Meteor has no account on testnet. In Meteor, switch to testnet and pick an account.");
@@ -147,20 +147,16 @@ function hashOf(outcome) {
 async function send(walletId, actions) {
   if (walletId === "my-near-wallet") throw new Error("MyNearWallet can no longer connect. Use Meteor.");
   const client = await open();
-  const previous = await client.getAccount(TARGET);
-  const row = await ensureAccount();
-  try {
-    const outcome = await prompt("near::sign_transactions", {
-      target: row.identifier,
-      transactions: [{ receiverId: contract, actions }],
-    });
-    return { accountId: row.identifier.accountId, txHash: hashOf(outcome) };
-  } catch (err) {
-    if (!previous?.identifier?.accountId && /blocked|popup/i.test(err.message || "")) {
-      throw new Error(`${row.identifier.accountId} is connected in Meteor. Click Meteor again to sign the login.`);
-    }
-    throw err;
+  const row = await client.getAccount(TARGET);
+  const accountId = row?.identifier?.accountId || "";
+  if (!/^[a-z0-9._-]{2,64}$/.test(accountId)) {
+    throw new Error("Connect Meteor first. The next click signs the transaction.");
   }
+  const outcome = await prompt("near::sign_transactions", {
+    target: row.identifier,
+    transactions: [{ receiverId: contract, actions }],
+  });
+  return { accountId, txHash: hashOf(outcome) };
 }
 
 function call(methodName, args, deposit) {
@@ -168,7 +164,13 @@ function call(methodName, args, deposit) {
 }
 
 export async function register(walletId) {
-  await open();
+  if (walletId === "my-near-wallet") throw new Error("MyNearWallet can no longer connect. Use Meteor.");
+  const client = await open();
+  const existing = await client.getAccount(TARGET);
+  if (!existing?.identifier?.accountId) {
+    const row = await ensureAccount();
+    return { accountId: row.identifier.accountId, needsSign: true };
+  }
   return send(walletId, [call("register", {}, 0n)]);
 }
 

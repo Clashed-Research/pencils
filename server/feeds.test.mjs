@@ -59,33 +59,104 @@ test("a plugged-in agent publishes its own sourced market", () => {
   const user = { id: "ada", balance: 0, agents: [], positions: [], resolved: [], notif: {} };
   const agent = { id: "scout", name: "Scout", perms: { propose: true, trade: false } };
   user.agents.push(agent);
+  const titles = [
+    "Ethereum staking stays above 30 percent before June 2027 on the chart",
+    "Solana daily transactions stay above 40 million before June 2027 on the report",
+    "A public cloud index prints storage under $2 before June 2027 in the data",
+    "One browser ships 3 post-quantum releases before June 2027 on the report",
+    "A satellite operator lists coverage above 80 countries before June 2027 in the data",
+    "A phone maker ships 2 foldable models before June 2027 on the chart",
+    "A rail operator prints on-time arrivals above 90 percent before June 2027 in the report",
+  ];
   const created = publishFromAgent(
     book,
     user,
     agent,
-    { title: "Bitcoin trades above $150000 before December 2026 on the price index", days: 7, sourceUrl: "https://x.com/NEARProtocol", sourceLabel: "X: NEARProtocol" },
+    { title: titles[0], days: 7, sourceUrl: "https://x.com/search?q=Ethereum", sourceLabel: "X trend: Ethereum" },
     now,
   );
   assert.equal(created.by, "scout");
-  assert.equal(created.feedUrl, "https://x.com/NEARProtocol");
+  assert.equal(created.feedUrl, "https://x.com/search?q=Ethereum");
   assert.ok(book.activity.some((row) => row.kind === "launched" && row.agentId === "scout"));
   assert.ok(book.activity.some((row) => row.kind === "approved" && row.marketId === created.id));
   assert.throws(
-    () => publishFromAgent(book, user, agent, { title: "Bitcoin trades above $150000 before December 2026", sourceUrl: "http://127.0.0.1/secret" }, now + 1),
+    () => publishFromAgent(book, user, agent, { title: titles[1], sourceUrl: "http://127.0.0.1/secret" }, now + 1),
     /public http source/,
   );
-  for (let i = 0; i < 5; i++) {
+  for (let i = 1; i < 6; i++) {
     publishFromAgent(
       book,
       user,
       agent,
-      { title: "Bitcoin trades above $150000 before December 2026 on the price index", days: 1, sourceUrl: `https://x.com/NEARProtocol?n=${i}`, sourceLabel: "X" },
+      { title: titles[i], days: 1, sourceUrl: `https://x.com/search?q=topic${i}`, sourceLabel: "X trend" },
       now + 10 + i,
     );
   }
   assert.throws(
-    () => publishFromAgent(book, user, agent, { title: "Bitcoin trades above $150000 before December 2026 on the price index", sourceUrl: "https://x.com/Reuters" }, now + 20),
+    () => publishFromAgent(book, user, agent, { title: titles[6], sourceUrl: "https://x.com/search?q=rail", sourceLabel: "X trend" }, now + 20),
     /6 markets/,
+  );
+});
+
+test("one hour can list a narrative market and a thesis market on the same X page", () => {
+  const now = 1_700_000_000_000;
+  const book = createState(now);
+  const user = { id: "ada", balance: 0, agents: [], positions: [], resolved: [], notif: {} };
+  const agent = { id: "scout", name: "Scout", perms: { propose: true, trade: false } };
+  user.agents.push(agent);
+  const page = "https://x.com/search?q=Nvidia&src=trend_click&f=live";
+  const narrative = publishFromAgent(
+    book,
+    user,
+    agent,
+    {
+      role: "narrative",
+      title: "Nvidia stays inside the top 5 X trends before December 2026 on the chart",
+      narrative: "Chip names are the loudest cluster on the live X trend board this hour.",
+      days: 7,
+      sourceUrl: page,
+      sourceLabel: "X trend: Nvidia",
+    },
+    now,
+  );
+  const thesis = publishFromAgent(
+    book,
+    user,
+    agent,
+    {
+      role: "thesis",
+      title: "Jensen is named in at least 100000 posts on the X search page before December 2026",
+      narrative: "The check is the post count on the Jensen search page, not the chip rank.",
+      days: 7,
+      sourceUrl: page,
+      sourceLabel: "X trend: Jensen",
+    },
+    now + 1,
+  );
+  assert.equal(narrative.role, "narrative");
+  assert.equal(thesis.role, "thesis");
+  assert.equal(narrative.feedUrl, thesis.feedUrl);
+  assert.match(narrative.sum, /loudest cluster/);
+  assert.ok(book.activity.some((row) => row.text.includes("narrative market")));
+  assert.ok(book.activity.some((row) => row.text.includes("thesis market")));
+  const other = { id: "other", name: "Other", perms: { propose: true, trade: false } };
+  const bob = { id: "bob", balance: 0, agents: [other], positions: [], resolved: [], notif: {} };
+  assert.throws(
+    () =>
+      publishFromAgent(
+        book,
+        bob,
+        other,
+        {
+          role: "thesis",
+          title: "Nvidia remains inside the top 5 X trends before December 2026 on the chart",
+          narrative: "A different desk writes the same chip rank claim with new words.",
+          sourceUrl: "https://x.com/search?q=NVDA",
+          sourceLabel: "X trend: NVDA",
+        },
+        now + 2,
+      ),
+    /repeats/,
   );
 });
 

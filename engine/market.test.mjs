@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { bet, connectAgent, createState, finalize, openCounter, overrideResolution, propose, proposeResolution, setPerm, stake, swarmTrade, withLedger } from "./book.mjs";
-import { applyBuy, freshPool, LIQ, seedTo, spot } from "./math.mjs";
+import { bet, connectAgent, createState, finalize, openCounter, overrideResolution, propose, proposeResolution, quoteToward, setPerm, stake, swarmTrade, withLedger } from "./book.mjs";
+import { applyBuy, freshPool, LIQ, microToUsd, seedTo, spot } from "./math.mjs";
 
 test("opening book is solvent and near the designed price", () => {
   const state = createState(1_700_000_000_000);
@@ -174,6 +174,61 @@ test("swarm agents trade from their own bankroll", () => {
   assert.equal(state.balance, before);
   assert.ok(state.banks.pulse < bank);
   assert.equal(state.events[0].html.includes("Pulse"), true);
+});
+
+test("a trade splits the book fee between the listing agent and Pencils", () => {
+  const now = 1_700_000_000_000;
+  const state = createState(now);
+  const agent = connectAgent(state, { name: "Scout", kind: "external", now });
+  const thesis = propose(state, {
+    title: "Solana DEX volume beats Ethereum DEX volume for 5 straight days before December 15.",
+    days: 7,
+    by: agent.id,
+    now,
+    narrative: "Solana volume is the loudest trading narrative this hour.",
+    role: "thesis",
+  });
+  assert.equal(thesis.role, "thesis");
+  assert.match(thesis.sum, /loudest trading narrative/);
+  const balance = state.balance;
+  const pulseBank = state.banks.pulse;
+  const fill = bet(state, { marketId: thesis.id, side: "yes", amount: 10, now });
+  assert.equal(fill.fee, 0.05);
+  assert.equal(state.fees.byAgent[agent.id], "25000");
+  assert.equal(state.fees.pencils, "25000");
+  assert.equal(thesis.feeAgent, "25000");
+  assert.equal(thesis.feePencils, "25000");
+  assert.equal(state.balance, balance - 10);
+  assert.equal(state.banks.pulse, pulseBank);
+  const pencils = state.fees.pencils;
+  quoteToward(state, { marketId: thesis.id, target: 0.7, maxUsd: 40, now });
+  assert.equal(state.fees.pencils, pencils);
+  swarmTrade(state, { marketId: thesis.id, side: "no", amount: 10, agentId: "pulse", now });
+  assert.equal(state.fees.byAgent[agent.id], "50000");
+  assert.equal(state.fees.pencils, "50000");
+  assert.equal(state.balance, balance - 10);
+});
+
+test("coalition still receives only the fees a trade did not claim", () => {
+  const now = 1_700_000_000_000;
+  const state = createState(now);
+  const m = state.markets.find((x) => x.id === "gpu-drop");
+  const seedFees = BigInt(m.pool.fees);
+  assert.ok(seedFees > 0n);
+  const before = state.banks.pulse;
+  stake(state, { marketId: "gpu-drop", agentId: "pulse", amount: 10, now });
+  const afterStake = state.banks.pulse;
+  assert.equal(Math.round((before - afterStake) * 100) / 100, 10);
+  const allocated = BigInt(m.feeAgent) + BigInt(m.feePencils);
+  assert.equal(BigInt(m.pool.fees) - allocated, seedFees);
+  m.ends = now - 1;
+  proposeResolution(state, { marketId: "gpu-drop", outcome: "yes", now });
+  finalize(state, { marketId: "gpu-drop", now: now + 25 * 60 * 60 * 1000 });
+  const paid = Math.round((state.banks.pulse - afterStake) * 100) / 100;
+  const expected = Math.round(microToUsd(seedFees) * 100) / 100;
+  assert.equal(paid, expected);
+  assert.ok(Math.round(microToUsd(BigInt(m.pool.fees)) * 100) / 100 > expected);
+  assert.equal(state.balance, 250);
 });
 
 test("fixture: $10 Yes buy from a fresh 50/50 pool", () => {

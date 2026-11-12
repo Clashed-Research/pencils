@@ -48,6 +48,7 @@ import {
   saveAgentKey,
   saveBook,
   saveUser,
+  endSession,
   startAgentToken,
   startSession,
   userByAccount,
@@ -266,6 +267,13 @@ const server = http.createServer(async (req, res) => {
         return okView(user, { accountId });
       });
       return json(res, 200, result);
+    }
+    if (req.method === "POST" && url.pathname === "/api/logout") {
+      rateLimit(clientIp(req));
+      endSession(sessionToken(req));
+      const secure = req.headers["x-forwarded-proto"] === "https" ? "; Secure" : "";
+      res.setHeader("set-cookie", `pencils=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0${secure}`);
+      return json(res, 200, { ok: true });
     }
     if (req.method === "POST" && (url.pathname === "/api/deposit" || url.pathname === "/api/withdraw")) {
       rateLimit(clientIp(req));

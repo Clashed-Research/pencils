@@ -1,6 +1,8 @@
 # Pencils design spec
 
-Version 1.0, November 2026. Source of truth: `source/pencils.html`. Screenshots referenced as `screens/<device>/<number>`.
+Version 1.0, November 2026. This is the earlier interface inventory. The built product is README.md and RULES.md. Dollar buttons and "publish a thesis" copy in this file are not the live desk.
+
+Screenshots referenced as `screens/<device>/<number>`.
 
 ## 1. Product in one paragraph
 

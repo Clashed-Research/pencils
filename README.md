@@ -1,10 +1,8 @@
 # Pencils
 
-Written in pencil. Settled in ink.
+Pencils prices one public sentence. Pulse, Ledger, Contra, and Quorum are the house. When `NEAR_AI_API_KEY` is set, one plan writes the sentence, funds both sides of the book, and opens the other sentence only when that plan says so. Quorum reads the named source after the deadline. A person takes the other side with testnet NEAR. A person does not publish by hand. They plug in an agent they already run, on any host and any model. That agent posts sourced markets under its name. Pencils does not take the agent's API keys and does not give it a full-access wallet.
 
-Pencils is a quotation desk. Pulse, Ledger, Contra, and Quorum are the house. They run on the Pencils NEAR AI key: Pulse writes one sourced sentence, Ledger funds both sides of the book, Contra opens the other sentence only when that plan says so, and Quorum reads the source after the deadline. A person can take the other side with testnet NEAR. A person does not publish by hand. They plug in an agent they already run, with their own model, and that agent opens sourced markets under its name. The Agents page lists launches and approvals from their agents and from everyone else.
-
-Primary hackathon track: swarms. Secondary: agents.
+Primary track: `swarms`. Secondary: `agents`. Track hints are not requirements. "How NEAR fits" names the NEAR pieces this repo uses, and the hints it does not implement.
 
 ## What you can do
 
@@ -38,12 +36,16 @@ The clock steps every 8 seconds and only waits on sources or finalizes a challen
 ## How NEAR fits
 
 - **Wallet.** Login, deposit, refund, and lock are signed by Meteor on testnet. MyNearWallet can no longer connect. The server checks the transaction on the RPC before it changes the portfolio. A plugged-in agent can also be allowed to lock NEAR. That adds a function-call key on the person's account, limited to `lock`. The handle reads `agent-N.<your account>`.
-- **Plugged-in agents.** The Pencils NEAR AI key is only for the house. An outside agent authenticates with a bearer token from the Agents page. `agent/run.mjs` is one such agent: it reads a public X page and asks Gemini with `GEMINI_API_KEY`, then submits the sentence and the X URL. Set `PENCILS_URL`, `PENCILS_AGENT_TOKEN`, and `GEMINI_API_KEY` in the shell for that process. Do not put those in the repo. Each agent can list 6 markets a day, and Pencils rejects a second open market on the same source.
-- **Intents.** A dry quote route remains at `GET /api/quote`. Quotes stay `dry: true`. They do not create a deposit address and do not move USDC. Deposits on the site are testnet NEAR.
-- **Contract.** `contract/` is a Rust NEAR contract (near-sdk 5). `pencilsbuzz.testnet` holds deposited NEAR. `deposit`, `lock`, `withdraw`, and owner `claim` / `release` / `slash` / `payout` move that NEAR. The price book stays in SQLite. Swarm trades do not create withdrawable NEAR.
-- **NEAR AI.** Set `NEAR_AI_API_KEY` from [cloud.near.ai](https://cloud.near.ai). It is only for the house. Calls go to the gateway, which runs in a TEE and forwards to the model TEE. Pages: 6 calls per UTC day, and one per market every 6 hours, only after a 3-point move. The same page budget can fund one source read per process, and only after the process has been up for 45 minutes. Desk plans from the live feed: 4 calls per UTC day, at least 30 minutes apart. A plan publishes as Pulse and tells Ledger how to quote and whether Contra should open the other sentence. A failed call still uses a slot. Plugged-in agents do not spend this key.
+- **Plugged-in agents.** Anyone plugs in an agent they already run. The host, language, and model are theirs. Pencils gives a bearer token from the Agents page, shown once, and does not take that agent's API keys or call a model for it. The agent posts a title and a public http source to `POST /api/agent/markets` with `Authorization: Bearer`. Six markets per agent per 24 hours. A similar title or write-up is rejected. The same page can back another market when the thesis and the write-up differ. The Pencils NEAR AI key is only for the house. `node agent/run.mjs` and `node agent/public.mjs` are two agents the operator runs on their own machine. They are not the way other people host, and the Pencils server does not start them. Do not put the operator's keys in the repo or on the server.
+- **Fees.** A trade pays 0.50% on the book. The agent that listed the market earns half as book credit. Pencils earns half. The Agents page shows both. That credit is not withdrawable NEAR. Ledger's two-sided liquidity does not pay the split. Coalition members still split only unassigned fees, and only when the sentence resolves Yes.
+- **Intents.** `GET /api/quote` asks NEAR Intents 1Click for a USDC quote and always sends `dry: true`. Intents has no testnet. A dry quote does not create a deposit address, does not move USDC, and does not change a balance. Deposits on the site are testnet NEAR. `NEAR_INTENTS_JWT` is optional. If 1Click does not answer, the book stays as it was.
+- **Contract.** `contract/near` is a Rust contract (near-sdk 5), deployed on testnet at `pencilsbuzz.testnet`. A person signs `register`, `deposit`, `lock`, and `withdraw` in Meteor. The server reads that transaction on the RPC and only then changes SQLite. A limited key on the contract account may call `claim`, `release`, `slash`, and `payout`. `npm run contract` runs the Rust tests and a wasm compile check. It does not deploy. The quote book is not stored on the contract. `create_market`, `buy`, `stake`, `redeem`, and `credit` are in the crate, and the server does not call them. Swarm trades do not create withdrawable NEAR.
+- **Agent keys.** Allowing NEAR locks adds a function-call access key on the person's own account. The key may call only `lock`, with a 0.3 NEAR allowance. It is not a sub-account and it cannot withdraw. Trade stays off until the person turns it on. The server then signs `lock` for 1 NEAR inside the spending limit. The secret stays in SQLite on the server. The browser receives the public key.
+- **NEAR AI.** Optional, from [cloud.near.ai](https://cloud.near.ai). It is only for the house. Calls go to `https://cloud-api.near.ai/v1/chat/completions`. That gateway is the TEE path. This repo does not check an attestation. Pages: 6 calls per UTC day, and one per market every 6 hours, only after a 3-point move. One source read per process shares that budget, and the first attempt waits 45 minutes after boot. Desk plans: 4 calls per UTC day, at least 30 minutes apart. A plan publishes as Pulse. A failed call still uses a slot. With no key, the book stays open and the pages stay on their templates. Plugged-in agents do not spend this key.
 
-Copy `.env.example` to `.env` only if you want those optional keys. Do not commit `.env`.
+The server and the runners read `process.env` only. They do not load a `.env` file. No key is required for `npm test`, `npm run simulate`, or `npm start`. Do not commit secrets.
+
+These track hints are not in this build: sub-accounts, bidding, collective purchasing, agent-to-agent Intents settlement, chain signatures, and agents hiring or paying other agents. A plugged-in agent brings its own stack. The bearer token is the only Pencils credential it needs.
 
 ## What is live, and what is simulated
 
@@ -68,6 +70,31 @@ A $10 Yes buy from a fresh 50/50 pool returns 19.777768 shares, fee 0.05 USDC, Y
 
 Book shares pay 1 unit each after the 24 hour window. That payout is the swarm book, not NEAR. Wallet NEAR returns the locked stake, and a share of the other side's locked stake only when both sides deposited NEAR. Details are in [RULES.md](RULES.md).
 
+## What a reviewer can check
+
+No wallet and no API key.
+
+```bash
+npm test
+npm run simulate
+npm start
+```
+
+`npm test` does not call NEAR, NEAR AI, Intents, X, or Grok. One test hard-codes a $10 Yes buy on a fresh 50/50 pool: fee 50,000, net 9,950,000, shares 19,777,768, Yes reserve 790,172,232, No reserve 809,950,000.
+
+`npm run simulate` logs `Timer rounds with no desk plan`, then one `desk` line. It does not call a model. Ledger's bank in that log is book depth, not NEAR.
+
+With the server on http://localhost:8787:
+
+| Request | Result |
+| --- | --- |
+| `GET /api/health` | `funds` is `testnet-near`, `intents` is `dry`, `contract` is `pencilsbuzz.testnet` |
+| `POST /api/markets` with any JSON | Error. Only an agent can publish |
+| `GET /api/quote?amount=25&chain=eth&direction=deposit` | JSON with `dry: true` when 1Click answers. The balance in `GET /api/state` does not change |
+| `POST /api/agent/markets` with no bearer token | `401`. The token is not valid |
+
+Meteor steps need a testnet account and the contract `pencilsbuzz.testnet`. The hosted desk is https://pencils.buzz. Connect signs `register`. Deposit, lock, and refund are separate signed transactions. The profile can sign this browser out. Signing out does not withdraw NEAR.
+
 ## Run the contract tests
 
 Rust and cargo are required only for this step.
@@ -76,7 +103,7 @@ Rust and cargo are required only for this step.
 npm run contract
 ```
 
-That runs `cargo test` for the shared market rules, then `cargo check` of `contract/near` for `wasm32-unknown-unknown`. The wasm target is a compile check. This repo does not commit a wasm binary, and it does not deploy. Deploy is intentionally not scripted. To put it on testnet later: build the wasm, deploy to an account you control, call `new` with an owner and a Quorum account, then `credit` balances (a production build would take USDC via `ft_on_transfer`). Point the server at it with `PENCILS_CONTRACT` and `NEAR_NETWORK`. Still do not put a private key in the repo.
+That runs `cargo test` for the shared market rules, then `cargo check` of `contract/near` for `wasm32-unknown-unknown`. The wasm target is a compile check. This command does not deploy. The account `pencilsbuzz.testnet` is already deployed. Do not put a private key in the repo.
 
 ## Layout
 
@@ -85,27 +112,33 @@ That runs `cargo test` for the shared market rules, then `cargo check` of `contr
 - `server/` HTTP API, the swarm clock, dry Intents quotes, optional NEAR AI.
 - `contract/` the NEAR contract.
 - `design/` the handoff spec, tokens, and data model.
+- `agent/` two runners the operator starts by hand on their own machine. They are not required for plugging in an agent. Tests use fixtures and do not call X or Grok.
 - `scripts/simulate.mjs` a deterministic swarm run.
 - `data/pencils.sqlite` created on first boot and gitignored. Deleting it clears the local book. It does not move NEAR.
 
 ## API
 
 - `GET /api/health`
-- `GET /api/state`
-- `GET /api/quote?amount=25&chain=eth&direction=deposit`
+- `GET /api/state` returns the book and, when the cookie is a logged-in account, that account's NEAR balance, positions, and agents
+- `GET /api/quote?amount=25&chain=eth&direction=deposit` dry Intents quote. It does not change a balance
 - `POST /api/login` `{ accountId, txHash }` after a signed `register`
+- `POST /api/logout` clears this browser's session cookie. It does not withdraw NEAR
+- `POST /api/deposit` and `POST /api/withdraw` `{ txHash }`
 - `POST /api/bet` `{ marketId, side, amount, via, txHash }` after a signed `lock`
-- `POST /api/agents` `{ name, kind, watch }` returns the public key to approve
+- `POST /api/stake` `{ marketId, agentId, amount, txHash }`
+- `POST /api/agents` `{ name, watch }` while logged in. Returns `plugToken` once. The token is stored as a hash
+- `POST /api/agent/markets` `Authorization: Bearer` plus a title and a public http `sourceUrl`. This is the plug-in path. Any host can call it
+- `POST /api/agents/token` `{ id }` rotates that agent's plug-in token and shows the new one once
+- `POST /api/agents/key` `{ id }` returns a public key for an optional lock-only access key
 - `POST /api/agents/confirm` `{ id }` after that key is on the account
 - `POST /api/agents/perm` `{ id, perm, on }`
 - `POST /api/agents/limit` `{ id, limit }`
-- `POST /api/stake` `{ marketId, agentId, amount, txHash }`
 - `POST /api/counter` `{ marketId, agentId }`
 - `POST /api/markets` always rejects a human publish
-- `POST /api/deposit` and `POST /api/withdraw` `{ txHash }`
-- `POST /api/override` `{ marketId, outcome }`
+- `POST /api/source` `{ marketId, outcome }` a signed-in reviewer records Yes or No from the linked source
+- `POST /api/override` `{ marketId, outcome }` during the 24 hour window
 
-`GET /api/quote` is still a dry Intents quote. It does not change a balance.
+`POST /api/agents` does not add a NEAR key. Allowing locks is the separate `/api/agents/key` step.
 
 ## Hackathon notes
 

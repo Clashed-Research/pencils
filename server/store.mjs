@@ -197,6 +197,12 @@ export function startSession(userId) {
   return token;
 }
 
+export function endSession(token) {
+  if (!token || !/^[a-f0-9]{64}$/.test(token)) return;
+  const tokenHash = createHash("sha256").update(token).digest("hex");
+  db.prepare("DELETE FROM sessions WHERE token_hash = ?").run(tokenHash);
+}
+
 export function userByToken(token) {
   if (!token || !/^[a-f0-9]{64}$/.test(token)) return null;
   const tokenHash = createHash("sha256").update(token).digest("hex");
