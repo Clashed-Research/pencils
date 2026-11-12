@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { bet, withLedger } from "../engine/book.mjs";
-import { blankUser, closeStore, insertUser, loadBook, openStore, reserveAiCall, saveBook, saveUser, startSession, userByToken } from "./store.mjs";
+import { agentByPlugToken, blankUser, closeStore, insertUser, loadBook, openStore, reserveAiCall, saveBook, saveUser, startAgentToken, startSession, userByToken } from "./store.mjs";
 
 test("sqlite keeps the shared book and separate account balances", () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "pencils-"));
@@ -38,6 +38,14 @@ test("sqlite keeps the shared book and separate account balances", () => {
   const savedAda = userByToken(startSession(ada.id));
   assert.equal(again.markets.find((m) => m.id === "btc-150").p, price);
   assert.equal(savedAda.balance, 240);
+  ada.agents = [{ id: "ua1", name: "Scout", perms: { propose: true } }];
+  saveUser(ada);
+  const plug = startAgentToken("ua1", ada.id);
+  assert.equal(agentByPlugToken(plug).agent.name, "Scout");
+  assert.equal(agentByPlugToken("pk_" + "ab".repeat(24)), null);
+  const next = startAgentToken("ua1", ada.id);
+  assert.equal(agentByPlugToken(plug), null);
+  assert.equal(agentByPlugToken(next).agent.id, "ua1");
   assert.equal(savedAda.positions[0].side, "yes");
   assert.equal(again.balance, 0);
 });

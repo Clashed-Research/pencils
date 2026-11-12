@@ -131,6 +131,20 @@ function pushEvent(state, html, now) {
   state.events = state.events.slice(0, 30);
 }
 
+function recordActivity(state, { kind, agentId = "", name = "", marketId = "", text = "", now = Date.now() }) {
+  state.activity = state.activity || [];
+  state.activity.unshift({
+    id: `${kind}-${now.toString(36)}-${state.activity.length}`,
+    t: now,
+    kind: String(kind || "note").slice(0, 24),
+    agentId: String(agentId || "").slice(0, 40),
+    name: String(name || "").slice(0, 40),
+    marketId: String(marketId || "").slice(0, 40),
+    text: String(text || "").replace(/\s+/g, " ").trim().slice(0, 180),
+  });
+  state.activity = state.activity.slice(0, 80);
+}
+
 function plain(t) {
   return t.replace(/\[\[|\]\]/g, "");
 }
@@ -327,7 +341,7 @@ export function connectAgent(state, { name, kind = "near", watch = "", parent = 
     id: "ua" + now.toString(36) + Math.floor(Math.random() * 1e6).toString(36),
     name: clean,
     handle: parent ? `agent-${n}.${parent}` : `agent-${n}.pencilsbuzz.testnet`,
-    kind: kind === "api" ? "api" : "near",
+    kind: kind === "api" || kind === "external" ? kind : "near",
     glyph: ["ring", "plus", "bars", "half"][(n - 1) % 4],
     watch: String(watch || "").trim().slice(0, 80),
     perms: { propose: true, trade: false },
@@ -343,7 +357,8 @@ export function connectAgent(state, { name, kind = "near", watch = "", parent = 
     },
   };
   state.agents.push(a);
-  pushEvent(state, `<b>${esc(clean)}</b> joined the swarm as ${esc(a.handle)}`, now);
+  pushEvent(state, `<b>${esc(clean)}</b> plugged in as ${esc(a.handle)}`, now);
+  recordActivity(state, { kind: "plugged", agentId: a.id, name: clean, text: `${clean} plugged in`, now });
   bump(state);
   return a;
 }
@@ -475,7 +490,19 @@ export function propose(state, { title, days = 7, by, now = Date.now(), source }
   });
   m.hist = m.hist.map(() => m.p);
   state.markets.push(m);
-  pushEvent(state, `<b>${esc(agentName(state, by))}</b> proposed “${esc(short(t))}”`, now);
+  const who = agentName(state, by);
+  pushEvent(state, `<b>${esc(who)}</b> proposed “${esc(short(t))}”`, now);
+  recordActivity(state, { kind: "launched", agentId: by, name: who, marketId: id, text: `${who} launched “${short(t)}”`, now });
+  if (url) {
+    recordActivity(state, {
+      kind: "approved",
+      agentId: by,
+      name: who,
+      marketId: id,
+      text: `${who} listed a sourced market`,
+      now: now + 1,
+    });
+  }
   bump(state);
   return m;
 }
@@ -702,6 +729,7 @@ export function clientView(state, now = Date.now()) {
     })),
     feeds: (state.feeds || []).slice(0, 8),
     events: state.events,
+    activity: (state.activity || []).slice(0, 40),
     resolved: state.resolved || [],
     near: {
       network: process.env.NEAR_NETWORK || "testnet",

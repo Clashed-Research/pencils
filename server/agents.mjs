@@ -76,24 +76,35 @@ export function hardenThesis(title) {
   return t;
 }
 
-function watchHits(watch, text) {
-  const words = String(watch || "")
-    .toLowerCase()
-    .split(/[^a-z0-9]+/)
-    .filter((w) => w.length > 2);
-  if (!words.length) return false;
-  const blob = text.toLowerCase();
-  return words.some((w) => blob.includes(w));
-}
-
-export function choosePublisher(users, text) {
-  for (const user of users) {
-    for (const agent of user.agents || []) {
-      if (!agent.perms?.propose) continue;
-      if (watchHits(agent.watch, text)) return { user, agent };
-    }
+export function publishFromAgent(book, user, agent, body, now = Date.now()) {
+  if (!agent?.perms?.propose) throw new Error("That agent cannot publish");
+  const url = publicSourceUrl(body?.sourceUrl);
+  if (!url) throw new Error("The thesis needs a public http source");
+  const title = hardenThesis(body?.title);
+  if (!scoreThesis(title).ok) throw new Error("Quorum rejected the agent draft");
+  const days = [1, 7, 30].includes(Number(body?.days)) ? Number(body.days) : 7;
+  const recent = book.markets.filter((m) => m.by === agent.id && now - Number(m.created || 0) < 86400000).length;
+  if (recent >= 6) throw new Error("This agent already opened 6 markets today");
+  if (book.markets.some((m) => m.by === agent.id && m.feedUrl === url && m.status === "open")) {
+    throw new Error("This agent already listed that source");
   }
-  return null;
+  let host = "";
+  try {
+    host = new URL(url).hostname;
+  } catch {
+    host = "";
+  }
+  const kind = host === "x.com" || host.endsWith(".x.com") ? "x" : "news";
+  const label = String(body?.sourceLabel || (kind === "x" ? "X" : "Source")).replace(/\s+/g, " ").trim().slice(0, 90);
+  return withLedger(book, user, () =>
+    propose(book, {
+      title,
+      days,
+      by: agent.id,
+      now,
+      source: { src: [kind, label], url },
+    }),
+  );
 }
 
 function safeHttpUrl(value) {
@@ -137,11 +148,5 @@ export function publishDraft(book, users, draft, post, now = Date.now()) {
   book.seenFeeds = book.seenFeeds || [];
   if (!book.seenFeeds.includes(post.id)) book.seenFeeds.push(post.id);
   book.seenFeeds = book.seenFeeds.slice(-400);
-  const hosted = choosePublisher(users, `${post.title} ${draft.title}`);
-  if (hosted) {
-    return withLedger(book, hosted.user, () =>
-      propose(book, { title, days: draft.days, by: hosted.agent.id, now, source }),
-    );
-  }
   return propose(book, { title, days: draft.days, by: "pulse", now, source });
 }

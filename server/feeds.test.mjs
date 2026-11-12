@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { createState, scoreThesis } from "../engine/book.mjs";
-import { hardenThesis, parseDraft, parseVerdict, publicSourceUrl, publishDraft } from "./agents.mjs";
+import { hardenThesis, parseDraft, parseVerdict, publicSourceUrl, publishDraft, publishFromAgent } from "./agents.mjs";
 import { postsFromRss, postsFromX } from "./feeds.mjs";
 import { applyDeskPlan, step } from "./swarm.mjs";
 import { closeStore, openStore, reserveAgentCall, reserveAiCall } from "./store.mjs";
@@ -41,7 +41,7 @@ test("an agent draft becomes a market and a human cannot publish", () => {
   });
   const post = { id: "x:1", source: "x", title: "Bitcoin jumps on the price index", url: "https://x.com/NEARProtocol" };
   const created = publishDraft(book, [user], { title: "Bitcoin stays above $150000 before December 2026", days: 7 }, post, 1_700_000_000_000);
-  assert.equal(created.by, "scout");
+  assert.equal(created.by, "pulse");
   assert.equal(created.src[0], "x");
   assert.equal(created.feedUrl, post.url);
   assert.match(created.crit, /x\.com\/NEARProtocol/);
@@ -50,6 +50,42 @@ test("an agent draft becomes a market and a human cannot publish", () => {
   assert.throws(
     () => publishDraft(book, [user], { title: "Bitcoin stays above $150000 before December 2026", days: 7 }, { id: "x:2", source: "x", title: "No link", url: "" }, 1_700_000_000_001),
     /no source/,
+  );
+});
+
+test("a plugged-in agent publishes its own sourced market", () => {
+  const now = 1_700_000_000_000;
+  const book = createState(now);
+  const user = { id: "ada", balance: 0, agents: [], positions: [], resolved: [], notif: {} };
+  const agent = { id: "scout", name: "Scout", perms: { propose: true, trade: false } };
+  user.agents.push(agent);
+  const created = publishFromAgent(
+    book,
+    user,
+    agent,
+    { title: "Bitcoin trades above $150000 before December 2026 on the price index", days: 7, sourceUrl: "https://x.com/NEARProtocol", sourceLabel: "X: NEARProtocol" },
+    now,
+  );
+  assert.equal(created.by, "scout");
+  assert.equal(created.feedUrl, "https://x.com/NEARProtocol");
+  assert.ok(book.activity.some((row) => row.kind === "launched" && row.agentId === "scout"));
+  assert.ok(book.activity.some((row) => row.kind === "approved" && row.marketId === created.id));
+  assert.throws(
+    () => publishFromAgent(book, user, agent, { title: "Bitcoin trades above $150000 before December 2026", sourceUrl: "http://127.0.0.1/secret" }, now + 1),
+    /public http source/,
+  );
+  for (let i = 0; i < 5; i++) {
+    publishFromAgent(
+      book,
+      user,
+      agent,
+      { title: "Bitcoin trades above $150000 before December 2026 on the price index", days: 1, sourceUrl: `https://x.com/NEARProtocol?n=${i}`, sourceLabel: "X" },
+      now + 10 + i,
+    );
+  }
+  assert.throws(
+    () => publishFromAgent(book, user, agent, { title: "Bitcoin trades above $150000 before December 2026 on the price index", sourceUrl: "https://x.com/Reuters" }, now + 20),
+    /6 markets/,
   );
 });
 

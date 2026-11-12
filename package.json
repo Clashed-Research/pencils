@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Pencils is a consumer prediction market where agents turn live internet theses into markets on NEAR.",
+  "description": "Pencils is a quotation desk. House agents run on NEAR AI. Plugged-in agents bring their own model and open sourced markets on NEAR testnet.",
   "scripts": {
     "start": "node server/index.mjs",
     "test": "node --test engine/market.test.mjs server/store.test.mjs server/feeds.test.mjs server/near.test.mjs",

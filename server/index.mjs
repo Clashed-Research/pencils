@@ -16,7 +16,7 @@ import {
   withLedger,
 } from "../engine/book.mjs";
 import { draftThesis, readSource, writeConsensus, aiEnabled } from "./ai.mjs";
-import { attachKnownSources, parseDraft, parseVerdict, publicSourceUrl, publishDraft } from "./agents.mjs";
+import { attachKnownSources, parseDraft, parseVerdict, publicSourceUrl, publishDraft, publishFromAgent } from "./agents.mjs";
 import { loadFeeds } from "./feeds.mjs";
 import { quoteUsdc } from "./intents.mjs";
 import { keyPair, signAndSend } from "./near.mjs";
@@ -32,6 +32,7 @@ import {
   verifiedCall,
 } from "./funds.mjs";
 import {
+  agentByPlugToken,
   agentKey,
   agentUsage,
   claimNearTx,
@@ -47,6 +48,7 @@ import {
   saveAgentKey,
   saveBook,
   saveUser,
+  startAgentToken,
   startSession,
   userByAccount,
   userByToken,
@@ -277,6 +279,25 @@ const server = http.createServer(async (req, res) => {
       });
       return json(res, 200, result);
     }
+    if (req.method === "POST" && url.pathname === "/api/agent/markets") {
+      rateLimit(clientIp(req));
+      const body = await readBody(req);
+      const header = String(req.headers.authorization || "");
+      const token = header.slice(0, 7).toLowerCase() === "bearer " ? header.slice(7).trim() : "";
+      const result = await serial(() => {
+        const found = agentByPlugToken(token);
+        if (!found) {
+          const err = new Error("That agent token is not valid");
+          err.status = 401;
+          throw err;
+        }
+        const created = publishFromAgent(book, found.user, found.agent, body, Date.now());
+        saveUser(found.user);
+        saveBook(book);
+        return { marketId: created.id, title: created.t, feedUrl: created.feedUrl, by: found.agent.name };
+      });
+      return json(res, 200, result);
+    }
     if (req.method === "POST" && url.pathname.startsWith("/api/")) {
       rateLimit(clientIp(req));
       const body = await readBody(req);
@@ -320,17 +341,33 @@ const server = http.createServer(async (req, res) => {
         const payload = withLedger(book, user, () => {
           if (url.pathname === "/api/agents") {
             requireAccount(user);
-            const agent = connectAgent(book, { name: body.name, kind: body.kind, watch: body.watch, parent: user.accountId, now });
-            const keys = keyPair();
-            agent.publicKey = keys.publicKey;
-            saveAgentKey({
-              agentId: agent.id,
-              userId: user.id,
-              accountId: user.accountId,
-              publicKey: keys.publicKey,
-              secretKey: keys.secretKey,
-            });
-            return { agent, publicKey: keys.publicKey };
+            const agent = connectAgent(book, { name: body.name, kind: "external", watch: body.watch, parent: user.accountId, now });
+            const plugToken = startAgentToken(agent.id, user.id);
+            return { agent, plugToken };
+          }
+          if (url.pathname === "/api/agents/key") {
+            requireAccount(user);
+            const agent = (user.agents || []).find((a) => a.id === body.id);
+            if (!agent) throw new Error("Agent not found");
+            if (!agent.publicKey) {
+              const keys = keyPair();
+              agent.publicKey = keys.publicKey;
+              saveAgentKey({
+                agentId: agent.id,
+                userId: user.id,
+                accountId: user.accountId,
+                publicKey: keys.publicKey,
+                secretKey: keys.secretKey,
+              });
+            }
+            const key = agentKey(agent.id);
+            return { agent, publicKey: key?.public_key || agent.publicKey };
+          }
+          if (url.pathname === "/api/agents/token") {
+            requireAccount(user);
+            const agent = (user.agents || []).find((a) => a.id === body.id);
+            if (!agent) throw new Error("Agent not found");
+            return { agent, plugToken: startAgentToken(agent.id, user.id) };
           }
           if (url.pathname === "/api/agents/perm") {
             return { agent: setPerm(book, { id: body.id, perm: body.perm, on: body.on }) };

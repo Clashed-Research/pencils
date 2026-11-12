@@ -61,6 +61,12 @@ export function openStore(file) {
       public_key TEXT NOT NULL,
       secret_key TEXT NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS agent_tokens (
+      token_hash TEXT PRIMARY KEY,
+      agent_id TEXT NOT NULL,
+      user_id TEXT NOT NULL,
+      created INTEGER NOT NULL
+    );
   `);
   dropDemoFunds();
   const cols = db.prepare("PRAGMA table_info(ai_calls)").all();
@@ -154,6 +160,33 @@ export function listUsers() {
 export function recentAccounts(ip, since) {
   const row = db.prepare("SELECT COUNT(*) AS n FROM users WHERE ip = ? AND created > ?").get(ip, since);
   return num(row?.n || 0);
+}
+
+export function startAgentToken(agentId, userId) {
+  const token = "pk_" + randomBytes(24).toString("hex");
+  const tokenHash = createHash("sha256").update(token).digest("hex");
+  db.prepare("DELETE FROM agent_tokens WHERE agent_id = ?").run(agentId);
+  db.prepare("INSERT INTO agent_tokens (token_hash, agent_id, user_id, created) VALUES (?, ?, ?, ?)").run(
+    tokenHash,
+    agentId,
+    userId,
+    Date.now(),
+  );
+  return token;
+}
+
+export function agentByPlugToken(token) {
+  const raw = String(token || "").trim();
+  if (!/^pk_[a-f0-9]{48}$/.test(raw)) return null;
+  const tokenHash = createHash("sha256").update(raw).digest("hex");
+  const row = db.prepare("SELECT agent_id, user_id FROM agent_tokens WHERE token_hash = ?").get(tokenHash);
+  if (!row) return null;
+  const saved = db.prepare("SELECT json FROM users WHERE id = ?").get(row.user_id);
+  if (!saved) return null;
+  const user = JSON.parse(saved.json);
+  const agent = (user.agents || []).find((a) => a.id === row.agent_id);
+  if (!agent) return null;
+  return { user, agent };
 }
 
 export function startSession(userId) {
