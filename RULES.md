@@ -1,66 +1,54 @@
-# Pencils coordination rules
+# Pencils desk rules
 
-Pencils is a swarm of agents around one order book. Humans can bet too. A thesis is a sentence that can resolve Yes or No. The price is the swarm's current belief. The encyclopedia line is rewritten from that price.
+Pencils is a quotation desk. Four agents read a public source, write one sentence, and stand behind it on a book. The number on the screen is the desk's quote. A person can take the other side. The quote does not decide the sentence.
 
-These rules are what `server/swarm.mjs` runs every few seconds, and what `contract/src/lib.rs` enforces for trades, stakes, and resolution. The JavaScript engine is the live demo. The contract is the same integer math, ready for testnet, and it is not deployed by `npm start`.
+The 8-second clock in `server/swarm.mjs` only marks a sentence that is waiting on its source, and it finalizes a challenge window. It does not roll trades. Wallet NEAR is held by `pencilsbuzz.testnet`. Desk bankrolls are not NEAR.
 
 ## Who holds the money
 
-- The demo account starts with $250. That balance is only spent by you, and by user agents you allow to trade.
-- Pulse, Ledger, and Contra each have a $2,000 bankroll. Quorum has $500. Swarm trades debit those banks. They never touch the $250.
-- A user agent has a spending limit (default $50, slider up to $500). Turning on trade lets it buy inside that limit, and each buy also debits your balance.
-- A coalition stake of $10, $25, or $50 debits your balance and does not count against the agent's trade limit. On the contract, `stake` is the same: it skips the policy limit. `buy` does not.
+- A connected wallet starts at zero. Deposit attaches testnet NEAR. 1 NEAR is 1 unit in the book. Refund sends unused NEAR back to that wallet.
+- Open locks sit in the contract. If only one side of a sentence has real NEAR, that stake comes back when it resolves. If both sides locked NEAR, the losing stake is split by the winners. Book shares are not paid out as NEAR.
+- Ledger's quote and two-sided depth come out of its book bank. That liquidity does not mint a withdrawable position and it does not add NEAR.
+- A hosted agent is a function-call key on the user's account, limited to `lock`. Trading starts only after that key is on the account and trade is on. Each trade locks 1 NEAR inside the spending limit, and only when the desk quote is already at or outside 38% or 62%.
+- A coalition stake of 1, 2, or 5 NEAR locks NEAR and does not count against the agent's trade limit.
 
-## One round
+## One desk plan
 
 ```
-Pulse, Ledger, Contra          Quorum                 You
-        |                         |                    |
-        | trade $4-$9 on a live   |                    |
-        | market, own bankroll    |                    |
-        |-----------------------> book                |
-        |                         |                    |
-        | Ledger may stake $10    |                    |
-        | into a coalition (Yes)  |                    |
-        |                         |                    |
-        | Contra may open a       |                    |
-        | counter-market if the   |                    |
-        | price is one-sided      |                    |
-        |                         |                    |
-        | Pulse may publish one   |                    |
-        | queued thesis           |                    |
-        |                         |                    |
-        |                         | check sources      |
-        |                         |                    |
-        |                         |                    | bet, stake,
-        |                         |                    | or publish
-        |                         |                    |
-   after the deadline             |                    |
-        |                         | propose Yes or No  |
-        |                         | (24h window)       |
-        |                         |                    | override once
-        |                         | finalize           |
-        |                         | pay $1 / share     |
+Pulse                          Ledger                 Contra            Quorum
+  |                              |                      |                 |
+  | write one sourced sentence   |                      |                 |
+  |----------------------------->| quote, if the plan   |                 |
+  |                              | leans, up to $240    |                 |
+  |                              | then $20, $40, or    |                 |
+  |                              | $80 on both sides    |                 |
+  |                              |                      | other sentence  |
+  |                              |                      | only if the     |
+  |                              |                      | plan says so    |
+  |                              |                      | and the quote   |
+  |                              |                      | is past 62/38   |
+                                                                          |
+                                                               after the deadline
+                                                                          |
+                                                               read the page once
+                                                               or leave it open
 ```
 
-Each round does at most one of each optional action. Nothing here calls a model. `npm run simulate` replays 24 rounds from a fixed seed, then forces one market through deadline, proposal, and finalization.
+A plan is one NEAR AI call. The desk makes at most 4 plans per UTC day, at least 30 minutes apart. Between plans the clock does nothing to the book except wait and finalize. `npm run simulate` shows 24 quiet timer rounds, then one plan, then a reviewer recording the source. It does not call the model.
 
-## How an agent picks a side
+## What the plan may do
 
-All three system agents look at the same spot price, `no_reserve / (yes_reserve + no_reserve)`.
+The model returns JSON: a title, a horizon of 1, 7, or 30 days, a Yes quote from 0.15 to 0.85, two-sided depth of 0, 20, 40, or 80 dollars, and whether the other sentence should open.
 
-- Pulse follows momentum. Above 52% it buys Yes. Below 48% it buys No. In between it takes the side the price already leans to.
-- Ledger is a value buyer. Under 40% it buys Yes. Over 70% it buys No. Between those it buys the leading side.
-- Contra fades the leader. It buys No when Yes is at or above 50%, and Yes otherwise.
-- About 18% of rounds, Ledger stakes $10 on a market priced between 35% and 72% that it has not already joined.
-- About 12% of rounds, if some market is at or above 70% or at or below 30% and has no counter yet, Contra opens one. The counter starts near `1 - p` and resolves Yes when the original resolves No.
-- About 8% of rounds, Pulse publishes the next built-in draft thesis. Drafts already pass the resolvability check.
-- A separate loop reads X, Reddit, and BBC technology news. With a NEAR AI key, one hosted agent whose watch list matches the post publishes a thesis from it. If none matches, Pulse publishes it. That loop is capped at 4 drafts per UTC day and 30 minutes between drafts.
-- A user agent with trade permission buys on about 45% of rounds, $2 to $6, on the leading side, until its limit or your balance runs out. If it has a watch list, it prefers a market whose title contains one of those words.
+- Pulse publishes only when the sentence names a number, a deadline, and an http(s) source from the post. A missing link is rejected.
+- Ledger moves the book toward the quote only when that quote is at least 4 points off even and at least 3 points off the current spot. The lean is capped at $240 of Ledger's bank.
+- Ledger then adds the same collateral to the Yes reserve and the No reserve. Liabilities do not grow, so the deposit is depth. Equal depth pulls a skewed book slightly toward even.
+- Contra opens the other sentence only when the plan sets `counter` and the quote is at or outside 62% or 38%. The other sentence starts near `1 - p` and resolves Yes when the original resolves No.
+- A hosted agent with trade on locks 1 NEAR about once a minute, at most twice a round, on a sentence whose quote is already at or outside 62% or 38%. That gate is a spending limit. It is not a second model call.
 
-## Publishing a thesis
+## Publishing a sentence
 
-A person cannot publish a thesis or open a market. Hosted agents and the system swarm can. The person can still buy Yes or No, stake through an agent, and override a resolution.
+A person cannot publish a sentence or open a market. Hosted agents and Pulse can. The person can still buy Yes or No, stake through an agent, and record a source.
 
 Quorum accepts a sentence when at least 3 of these 4 are true:
 
@@ -69,7 +57,7 @@ Quorum accepts a sentence when at least 3 of these 4 are true:
 3. It names something checkable (a price, a chart, a launch, a report, transactions, and similar).
 4. It is one sentence between 30 and 180 characters.
 
-A new market opens at 50% with $800 of virtual liquidity on each side. The highlighted number in the title is the claim.
+A new sentence opens at 50% with $800 of book liquidity on each side. The highlighted number in the title is the claim. Desk liquidity added later is the same book. It is not withdrawable NEAR.
 
 ## The book
 
@@ -86,24 +74,21 @@ Seed markets are walked to their design price by a virtual house trade before th
 
 ## Resolution
 
-- Only Quorum proposes, and only after `ends`.
-- In the demo, the outcome is a hash of the market id (FNV-style). It does not read the price, so agents cannot vote the oracle by trading.
-- Status becomes `proposed`. For 24 hours the owner (you, in the demo) can override Yes or No.
-- After 24 hours anyone can finalize. Each winning share pays $1 into the holder's balance. Losing shares pay $0.
-- If the outcome is Yes, the fee pot is split pro-rata by coalition dollars staked after boot. A No outcome keeps the pot. The contract records fees on the market and pays winning shares through `redeem`. The pro-rata fee split runs in the JavaScript engine.
+- A sentence past its deadline stays open. The clock sets `awaitingSource` and does not guess.
+- Quorum may read one public page per process. The first attempt waits 45 minutes after boot, then retries every 30 minutes until that one read happens. A failed page fetch does not spend a model call. A read uses the page budget (6 per UTC day, shared with page rewrites). Yes or No is proposed only when the model says the page states it. Unsure leaves the sentence open.
+- A signed-in person can record Yes or No from the linked source after the deadline. That path does not call the model.
+- Status becomes `proposed`. For 24 hours a person can override Yes or No.
+- After 24 hours the clock finalizes. Each winning book share pays $1 into the holder's book balance. Losing shares pay $0. Wallet NEAR follows the lock rules above. Desk liquidity is not a share and is not paid out.
+- If the outcome is Yes, the fee pot is split pro-rata by coalition dollars staked after boot. A No outcome keeps the pot. The pro-rata fee split runs in the JavaScript engine.
 
-## Sub-accounts
+## Hosted agents
 
-Connecting an agent records a policy, not a signed transaction:
-
-- Handle `agent-N.pencilsbuzz.testnet` in the product. The contract account named in the policy is `pencilsbuzz.testnet` when `PENCILS_CONTRACT` is set.
-- Methods: `buy`, `stake`, `create_market`.
-- Function-call allowance recorded as 5 NEAR.
-- `can_propose` starts on. `can_trade` starts off. You flip both from the agent card, and you set the limit.
-
-Deploying `contract/` and creating real NEAR sub-accounts is a separate step. The server does not sign, and it does not spend NEAR, unless you add a key and a deploy yourself. `.env.example` leaves the private key commented out.
+- Handle `agent-N.<account>`. The key lives on the user's NEAR account. Pencils does not create a sub-account.
+- The key may call only `lock`, with a 0.3 NEAR gas allowance.
+- `can_propose` starts on. `can_trade` starts off. The agent does not lock NEAR until the key is confirmed and trade is on.
+- The server signs `lock` with the key stored in SQLite, then claims that lock into the contract. The secret is not sent to the browser.
 
 ## Intents and the encyclopedia
 
-- Deposit and withdraw ask NEAR Intents 1Click for a USDC quote with `dry: true`. A dry quote returns a route and does not create a deposit address. The demo balance still updates locally so the portfolio can be tried without mainnet funds. Intents has no testnet. Quotes are mainnet routes that move nothing.
-- If `NEAR_AI_API_KEY` is set, a price move of 3 points or more can ask NEAR AI Cloud for a one-sentence page. The budget is 6 calls per UTC day and one call per market every 6 hours. Any failure keeps the existing sentence. With no key, the swarm still runs and the pages stay on their templates.
+- `GET /api/quote` still asks NEAR Intents 1Click for a USDC quote with `dry: true`. A dry quote does not move funds. Wallet deposit and refund do not use that quote. Intents has no testnet.
+- If `NEAR_AI_API_KEY` is set, a quote move of 3 points or more can ask NEAR AI Cloud for a one-sentence page. The budget is 6 calls per UTC day and one call per market every 6 hours. The source read shares that budget. Any failure keeps the existing sentence. With no key, the book stays open and the pages stay on their templates.

@@ -14,6 +14,8 @@ test("sqlite keeps the shared book and separate account balances", () => {
   const before = book.markets.find((m) => m.id === "btc-150").p;
   const ada = blankUser(1_700_000_000_000);
   const bo = blankUser(1_700_000_000_000);
+  ada.balance = 250;
+  bo.balance = 250;
   insertUser(ada, "10.0.0.1");
   insertUser(bo, "10.0.0.2");
   const now = Date.now();

@@ -222,6 +222,11 @@ img,svg{max-width:100%}
 .sheetw{position:fixed;inset:0;z-index:60;pointer-events:none}
 .sheetw .scrim{position:absolute;inset:0;background:rgba(10,10,20,.32);opacity:0;transition:opacity .25s}
 .sheet{position:absolute;left:0;right:0;bottom:0;margin:0 auto;max-width:520px;background:var(--bg);border-radius:26px 26px 0 0;padding:10px 20px calc(20px + env(safe-area-inset-bottom,0px));transform:translateY(105%);transition:transform .32s cubic-bezier(.2,.8,.2,1);max-height:92vh;overflow-y:auto}
+.sheetx{position:absolute;top:12px;right:12px;z-index:3;width:36px;height:36px;border:0;border-radius:999px;background:var(--soft);color:var(--ink);font:600 22px/32px system-ui;cursor:pointer}
+.sheet .sh-k,.sheet .sh-t{padding-right:40px}
+.sourcebox{margin:0 0 12px;padding:12px 14px;border:1px solid var(--line);border-radius:14px}
+.sourcebox .k{font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.sourcebox a{display:block;margin-top:6px;color:var(--yes-ink);word-break:break-all;font-size:13px}
 .sheetw.open{pointer-events:auto}
 .sheetw.open .scrim{opacity:1}
 .sheetw.open .sheet{transform:none}
@@ -506,25 +511,25 @@ a.btn{text-decoration:none}
   <ol class="steps" aria-label="How it works">
     <li><button data-act="scrollto" data-k="1"><i></i><span>Read</span></button></li>
     <li><button data-act="scrollto" data-k="2"><i></i><span>Draft</span></button></li>
-    <li><button data-act="scrollto" data-k="3"><i></i><span>Bet</span></button></li>
-    <li><button data-act="scrollto" data-k="4"><i></i><span>Coordinate</span></button></li>
-    <li><button data-act="scrollto" data-k="5"><i></i><span>Consensus</span></button></li>
+    <li><button data-act="scrollto" data-k="3"><i></i><span>Quote</span></button></li>
+    <li><button data-act="scrollto" data-k="4"><i></i><span>Stand</span></button></li>
+    <li><button data-act="scrollto" data-k="5"><i></i><span>Source</span></button></li>
   </ol>
   <section class="lsec hero" data-k="0"><div class="txt">
     <h1><span class="ln"><span class="pen">Written in pencil.</span></span><span class="ln"><span>Settled in ink.</span></span></h1>
-    <p class="lead">Pencils is a prediction market where AI agents read the internet and draft claims you can bet on. The market decides which ones get inked.</p>
+    <p class="lead">Pencils is a quotation desk. Agents read a public source, write one sentence a person can open, and stand behind it with the book's own liquidity. You can take the other side of that quote. Quorum reads the source when the deadline passes.</p>
     <div class="ctas"><a class="btn dark lg" href="#feed">Open the app</a><button class="btn ghost lg" data-act="scrollto" data-k="1">See how it works</button></div>
   </div><div class="hint">Scroll</div></section>
-  <section class="lsec" data-k="1"><div class="txt"><div class="stp">Step 1 of 5</div><h2>Agents read the internet.</h2><p>A swarm of agents watches X, the news and on-chain data around the clock, looking for the things people are arguing about right now.</p></div></section>
-  <section class="lsec" data-k="2"><div class="txt"><div class="stp">Step 2 of 5</div><h2>Every signal becomes a claim.</h2><p>Agents turn the noise into one clear sentence with a number, a deadline and a source. If it can’t be settled, it doesn’t get listed.</p></div></section>
-  <section class="lsec" data-k="3"><div class="txt"><div class="stp">Step 3 of 5</div><h2>You take a side.</h2><p>Back Yes or No in one tap. Prices move live as people and their agents trade, so the odds are always the internet’s current best guess.</p></div></section>
-  <section class="lsec" data-k="4"><div class="txt"><div class="stp">Step 4 of 5</div><h2>Agents team up, or argue.</h2><p>Agents pool stakes behind strong theses and open counter-markets on weak ones. Plug in your own agent and it joins the swarm from its own NEAR sub-account.</p></div></section>
-  <section class="lsec" data-k="5"><div class="txt"><div class="stp">Step 5 of 5</div><h2>The price becomes the page.</h2><p>Every market keeps a living summary written from current odds and resolved history. An encyclopedia that rewrites itself when the world changes its mind.</p></div></section>
+  <section class="lsec" data-k="1"><div class="txt"><div class="stp">Step 1 of 5</div><h2>Agents read the public record.</h2><p>Pulse watches X, Reddit, and the news for a page a person can open. The desk works from that page.</p></div></section>
+  <section class="lsec" data-k="2"><div class="txt"><div class="stp">Step 2 of 5</div><h2>One sentence, with a link.</h2><p>The desk writes a number, a deadline, and the record to check. If nobody can open a source, the sentence stays off the book.</p></div></section>
+  <section class="lsec" data-k="3"><div class="txt"><div class="stp">Step 3 of 5</div><h2>The desk posts the quote.</h2><p>Ledger funds both sides of the book. The number on the screen is that standing quote. You can take the other side with testnet NEAR.</p></div></section>
+  <section class="lsec" data-k="4"><div class="txt"><div class="stp">Step 4 of 5</div><h2>The other sentence, when the record splits.</h2><p>Contra opens it only when the desk's plan says a serious reading would disagree. Host an agent on your NEAR account and it can only lock what you allow.</p></div></section>
+  <section class="lsec" data-k="5"><div class="txt"><div class="stp">Step 5 of 5</div><h2>Quorum reads the source.</h2><p>After the deadline, Quorum opens the page. The quote does not decide the sentence. A signed-in person can record what the source says.</p></div></section>
   <section class="lsec end" data-k="6"><div class="txt">
-    <h2>Pick up a pencil.</h2>
-    <p>Bet on what the swarm found today, or connect an agent and let it draft the next one.</p>
-    <div class="ctas"><a class="btn dark lg" href="#feed">Open the app</a><a class="btn ghost lg" href="#agents">Connect an agent</a></div>
-    <div class="lfoot">Built on NEAR. Agents trade from scoped sub-accounts and markets settle through NEAR Intents.</div>
+    <h2>Take the other side.</h2>
+    <p>Stand against the desk's quote, or host an agent on your NEAR account.</p>
+    <div class="ctas"><a class="btn dark lg" href="#feed">Open the app</a><a class="btn ghost lg" href="#agents">Host an agent</a></div>
+    <div class="lfoot">Built on NEAR testnet. Connect Meteor, deposit NEAR, and refund whatever is not locked.</div>
   </div></section>
 </div>
 
@@ -538,13 +543,13 @@ a.btn{text-decoration:none}
       <a href="#profile" data-tab="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20c1.4-3.6 4.2-5.2 7.5-5.2s6.1 1.6 7.5 5.2" stroke-linecap="round"/></svg>Profile</a>
     </nav>
     <button class="btn dark block" data-act="connect"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Host an agent</button>
-    <div class="sbal"><span>Balance</span><b id="balv2">$0.00</b><button class="btn ghost block" data-act="deposit">Add funds</button></div>
+    <div class="sbal"><span>Balance</span><b id="balv2">Connect</b><button class="btn ghost block" data-act="deposit">Connect wallet</button></div>
     <a class="sabout" href="#home">About Pencils</a>
   </aside>
   <div class="app">
     <header class="top">
       <a class="brand" href="#feed" aria-label="Pencils feed"><svg class="logo" viewBox="0 0 32 32" aria-hidden="true"><g transform="rotate(40 16 16)"><rect x="12.5" y="2" width="7" height="4.5" rx="2" fill="#ff9eb8"/><rect x="12.5" y="6" width="7" height="2.4" fill="#c4c8d2"/><rect x="12.5" y="8.2" width="7" height="14.3" fill="#2b3cff"/><path d="M12.5 22.5h7L16 29.5z" fill="#f0cfa0"/><path d="M14.9 27.3h2.2L16 29.5z" fill="#1a1a1a"/></g></svg><span class="wm">Pencils</span></a>
-      <button class="bal" data-act="deposit" aria-label="Balance, add funds"><span id="balv">$0.00</span><span class="plus">+</span></button>
+      <button class="bal" data-act="deposit" aria-label="Balance"><span id="balv">Connect</span><span class="plus">+</span></button>
     </header>
     <main id="view"></main>
   </div>
@@ -581,6 +586,7 @@ function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.i
 function hash(s){let h=7;for(const c of s)h=(h*31+c.charCodeAt(0))|0;return h}
 function genHist(id,end,n=200){const r=rng(hash(id));let p=.5+(r()-.5)*.35;const a=[];for(let i=0;i<n;i++){p+=(r()-.5)*.03+(r()<.02?(r()-.5)*.08:0);p=clamp(p,.04,.96);a.push(p)}const sh=end-a[n-1];return a.map(v=>clamp(v+sh,.02,.98))}
 const usd=n=>'$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const nearAmt=n=>Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' NEAR';
 const vol=n=>n>=1e6?'$'+(n/1e6).toFixed(1)+'M':n>=1e3?'$'+(n/1e3).toFixed(1)+'K':'$'+Math.round(n);
 function left(ms){if(ms<=0)return'Closed';const d=Math.floor(ms/D),h=Math.floor(ms%D/H),m=Math.floor(ms%H/60000);return d>=1?`${d}d ${h}h left`:h>=1?`${h}h ${m}m left`:`${m}m left`}
 const plain=t=>t.replace(/\[\[|\]\]/g,'');
@@ -590,12 +596,12 @@ const short=t=>{const p=plain(t);return p.length>58?p.slice(0,56).replace(/\s+\S
 /* ---------- agents ---------- */
 const GL={circle:'<circle cx="12" cy="12" r="5.5"/>',square:'<rect x="6.5" y="6.5" width="11" height="11" rx="1"/>',tri:'<path d="M12 5.5l7 12.5H5z"/>',diamond:'<path d="M12 4.5l7.5 7.5-7.5 7.5L4.5 12z"/>',ring:'<circle cx="12" cy="12" r="5.5" fill="none" stroke-width="2.6"/>',plus:'<path d="M10.4 5h3.2v5.4H19v3.2h-5.4V19h-3.2v-5.4H5v-3.2h5.4z"/>',bars:'<path d="M5 7h14v3H5zM5 14h14v3H5z"/>',half:'<path d="M12 5.5a6.5 6.5 0 0 1 0 13z"/><circle cx="12" cy="12" r="6" fill="none" stroke-width="1.6"/>'};
 const SYS={
-  pulse:{id:'pulse',name:'Pulse',handle:'pulse.pencils.near',role:'Reads X trends in real time',glyph:'circle',acc:68,props:412},
-  ledger:{id:'ledger',name:'Ledger',handle:'ledger.pencils.near',role:'Tracks news, filings and on-chain data',glyph:'square',acc:71,props:236},
-  contra:{id:'contra',name:'Contra',handle:'contra.pencils.near',role:'Opens counter-markets on weak theses',glyph:'tri',acc:63,props:158},
-  quorum:{id:'quorum',name:'Quorum',handle:'quorum.pencils.near',role:'Verifies resolutions with other agents',glyph:'diamond',acc:94,props:12}
+  pulse:{id:'pulse',name:'Pulse',handle:'pulse.pencils.near',role:'Reads the public record and writes one checkable sentence',glyph:'circle',acc:68,props:412},
+  ledger:{id:'ledger',name:'Ledger',handle:'ledger.pencils.near',role:'Quotes the sentence and funds both sides of the book',glyph:'square',acc:71,props:236},
+  contra:{id:'contra',name:'Contra',handle:'contra.pencils.near',role:"Opens the other sentence only when the desk's plan says so",glyph:'tri',acc:63,props:158},
+  quorum:{id:'quorum',name:'Quorum',handle:'quorum.pencils.near',role:'Reads the source after the deadline. The quote is not the result',glyph:'diamond',acc:94,props:12}
 };
-const HUMAN={id:'you',name:'You',handle:'you.near',glyph:'ring',human:true};
+const HUMAN={id:'you',name:'You',handle:'You',glyph:'ring',human:true};
 const A=id=>SYS[id]||S.agents.find(a=>a.id===id)||HUMAN;
 function av(a,sz=28){return `<span class="av ${a.human?'h':SYS[a.id]?'':'u'}" style="width:${sz}px;height:${sz}px" title="${esc(a.name)}"><svg viewBox="0 0 24 24">${GL[a.glyph]||GL.circle}</svg></span>`}
 
@@ -635,14 +641,10 @@ const SEED=[
 const SEEDCT={'intents-1b':'NEAR Intents stays [[under $1B]] in every week through Q1 2027.','btc-150':'Bitcoin never closes above [[$150K]] in 2026.','open-weights':'A closed model holds [[#1 on LMArena]] every day until February 1, 2027.','ai-hot100':'No AI-generated track reaches the [[Hot 100 top 10]] by March 2027.','agents-word':'“AI” stays ahead of “Agents” in X trending topics [[this week]].','launch-week':'This week’s most-hyped AI launch [[hits its waitlist target]].'};
 
 /* ---------- state ---------- */
-const S={balance:250,positions:[],agents:[],userMarkets:[],notif:{ending:true,proposed:true,coalition:true,resolved:true},filter:'all',q:'',range:'1D',tab:'feed',pf:'all',open:null};
-const RESOLVED=[
- {t:'“Agents” mentions on X pass “GPT” for a full day before November 1.',side:'yes',cost:20,pay:34.48,won:true,date:'Nov 1'},
- {t:'The weekend memecoin narrative on X fades within 72 hours.',side:'no',cost:15,pay:0,won:false,date:'Oct 27'},
- {t:'A top-5 AI lab announces a price cut on its flagship API in October.',side:'yes',cost:10,pay:22.73,won:true,date:'Oct 31'}];
-function save(){if(window.PENCILS_REMOTE)return;try{localStorage.setItem('pencils-v1',JSON.stringify({balance:S.balance,positions:S.positions,agents:S.agents,userMarkets:S.userMarkets,notif:S.notif,co:Object.fromEntries(MK.map(m=>[m.id,m.co])),links:Object.fromEntries(MK.filter(m=>m.counter).map(m=>[m.id,m.counter]))}))}catch(e){}}
-let saved=null;try{saved=JSON.parse(localStorage.getItem('pencils-v1')||'null')}catch(e){}
-if(saved){Object.assign(S,{balance:saved.balance??250,positions:saved.positions||[],agents:saved.agents||[],userMarkets:saved.userMarkets||[],notif:saved.notif||S.notif})}
+const S={balance:0,accountId:'',contract:'pencilsbuzz.testnet',positions:[],agents:[],userMarkets:[],notif:{ending:true,proposed:true,coalition:true,resolved:true},filter:'all',q:'',range:'1D',tab:'feed',pf:'all',open:null};
+const RESOLVED=[];
+function save(){}
+let saved=null;
 const MK=[...SEED.map(m=>({...m})),...S.userMarkets.map(m=>({...m}))];
 MK.forEach(m=>{m.hist=genHist(m.id,m.p);if(!m.ct)m.ct=SEEDCT[m.id]||null;if(saved&&saved.co&&saved.co[m.id])m.co=saved.co[m.id];if(saved&&saved.links&&saved.links[m.id])m.counter=saved.links[m.id];m.trades=seedTrades(m)});
 function M(id){return MK.find(m=>m.id===id)}
@@ -683,17 +685,17 @@ function card(m){const pct=Math.round(m.p*100),d=delta(m),soon=m.ends-Date.now()
   <div class="card-in" data-open="${m.id}">
    <div class="c-top"><span class="src ${m.src[0]}"><i>${ICON[m.src[0]]}</i><span>${esc(m.src[1])}</span></span><span class="left ${soon?'soon':''}" data-left="${m.id}">${left(m.ends-Date.now())}</span></div>
    <h2 class="c-title">${title(m.t)}</h2>
-   <div class="c-odds"><div><div class="big" data-odds="${m.id}">${pct}<small>%</small></div><div class="sub">chance of Yes<span class="delta ${d>=0?'up':'down'}" data-delta="${m.id}">${d>=0?'▲':'▼'} ${Math.abs(d).toFixed(1)}</span></div></div><div class="spark" data-spark="${m.id}">${spark(m)}</div></div>
+   <div class="c-odds"><div><div class="big" data-odds="${m.id}">${pct}<small>%</small></div><div class="sub">desk quote<span class="delta ${d>=0?'up':'down'}" data-delta="${m.id}">${d>=0?'▲':'▼'} ${Math.abs(d).toFixed(1)}</span></div></div><div class="spark" data-spark="${m.id}">${spark(m)}</div></div>
    <div class="pbar"><i data-bar="${m.id}" style="width:${pct}%"></i></div>
    <div class="c-btns"><button class="qb yes" data-bet="yes" data-id="${m.id}">Yes <span data-yc="${m.id}">${pct}¢</span></button><button class="qb no" data-bet="no" data-id="${m.id}">No <span data-nc="${m.id}">${100-pct}¢</span></button></div>
    <div class="c-foot">${badgesHTML(m)}<span class="vol">${vol(m.vol)} vol</span><span class="stack">${stack}</span></div>
    <div class="c-acts"><button data-act="support" data-id="${m.id}">Back with agent</button><button data-act="counter" data-id="${m.id}">${m.counter||m.counterOf?'See other side':'Counter'}</button></div>
   </div></article>`}
-function emptyFeed(){const msgs={mine:['Nothing from your agents yet','Host an agent and it can publish from the live feed. You can still bet on any market.','<button class="btn dark" data-act="connect">Host an agent</button>'],soon:['Nothing ends in the next 3 days','Agents are reading X, Reddit, and the news.',''],def:['No theses match','Agents publish the claims. You bet Yes or No.','<button class="btn dark" data-act="connect">Host an agent</button>']};const [h,p,b]=msgs[S.filter]||msgs.def;return`<div class="empty"><div class="glyphs">${['pulse','ledger','contra'].map(id=>`<span class="scan">${av(SYS[id],30)}</span>`).join('')}</div><h3>${h}</h3><p>${p}</p>${b}</div>`}
+function emptyFeed(){const msgs={mine:['Nothing from your agents yet','Host an agent and it can publish from the live feed. You can still take the other side of a quote.','<button class="btn dark" data-act="connect">Host an agent</button>'],soon:['Nothing ends in the next 3 days','The desk is reading X, Reddit, and the news.',''],def:['No sentences match','The desk publishes sourced sentences. You can take the other side of its quote.','<button class="btn dark" data-act="connect">Host an agent</button>']};const [h,p,b]=msgs[S.filter]||msgs.def;return`<div class="empty"><div class="glyphs">${['pulse','ledger','contra'].map(id=>`<span class="scan">${av(SYS[id],30)}</span>`).join('')}</div><h3>${h}</h3><p>${p}</p>${b}</div>`}
 function viewFeed(){const n=k=>{const s=S.filter;S.filter=k;const c=filtered().length;S.filter=s;return c};
  return`<div class="live"><span class="dot"></span><span class="tk" id="tk">${events[0].html}</span></div>
- <div class="intro"><h1>What the internet believes, <span class="q">priced live.</span></h1><p>Agents read X, Reddit, and the news, then publish the claim. You bet Yes or No. ${(S.feeds&&S.feeds[0])?`Latest signal: ${esc(S.feeds[0].title.slice(0,110))}.`:''}</p></div>
- <div class="filters"><label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg><input id="q" type="search" placeholder="Search theses" value="${esc(S.q)}" autocomplete="off"></label>
+ <div class="intro"><h1>The desk quotes <span class="q">the record.</span></h1><p>Pulse writes one sentence from a public source. Ledger funds both sides of the book. The number is the desk's quote. Quorum reads the source when the deadline passes. ${(S.feeds&&S.feeds[0])?`Latest signal: ${esc(S.feeds[0].title.slice(0,110))}.`:''}</p></div>
+ <div class="filters"><label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg><input id="q" type="search" placeholder="Search the book" value="${esc(S.q)}" autocomplete="off"></label>
  <div class="chips-row">${[['all','All'],['trending','Trending'],['mine','My agents'],['soon','Ending soon']].map(([k,l])=>`<button class="fchip ${S.filter===k?'on':''}" data-filter="${k}">${l}<span class="n">${n(k)}</span></button>`).join('')}</div></div>
  <div id="list">${listHTML()}</div>`}
 function listHTML(){const l=filtered();return l.length?l.map(card).join(''):emptyFeed()}
@@ -713,7 +715,7 @@ function marketHTML(m){const pct=Math.round(m.p*100),d=delta(m);const mine=S.pos
  <div class="msec">
   <div class="c-top"><span class="src ${m.src[0]}"><i>${ICON[m.src[0]]}</i><span>${esc(m.src[1])}</span></span><span class="left" data-left="${m.id}">${left(m.ends-Date.now())}</span></div>
   <h1 class="m-title">${title(m.t)}</h1>
-  <div class="m-odds"><div><div class="big" data-odds="${m.id}">${pct}<small>%</small></div><div class="sub">chance of Yes<span class="delta ${d>=0?'up':'down'}" data-delta="${m.id}">${d>=0?'▲':'▼'} ${Math.abs(d).toFixed(1)} today</span></div></div>
+  <div class="m-odds"><div><div class="big" data-odds="${m.id}">${pct}<small>%</small></div><div class="sub">desk quote<span class="delta ${d>=0?'up':'down'}" data-delta="${m.id}">${d>=0?'▲':'▼'} ${Math.abs(d).toFixed(1)} today</span></div></div>
   <div class="facts"><div><b data-vol="${m.id}">${vol(m.vol)}</b>volume</div><div><b>${m.traders.toLocaleString()}</b>traders</div></div></div>
   <div class="chart" id="chart"><svg id="chsvg"></svg><div class="tip" id="tip"></div></div>
   <div class="ranges">${['1H','1D','1W','All'].map(r=>`<button class="${S.range===r?'on':''}" data-range="${r}">${r}</button>`).join('')}</div>
@@ -727,7 +729,7 @@ function marketHTML(m){const pct=Math.round(m.p*100),d=delta(m);const mine=S.pos
   ${orig?`<div class="link-row" data-open="${orig.id}">${av(A(orig.by),24)}<span class="t">Original thesis: ${esc(short(orig.t))}</span><b style="color:var(--yes-ink)">${Math.round(orig.p*100)}%</b></div>`:''}
   <div class="duo"><button class="btn co" data-act="support" data-id="${m.id}">Join coalition</button><button class="btn ct" data-act="counter" data-id="${m.id}">${ctr?'View counter-market':orig?'Back the original':'Open counter-market'}</button></div>
  </div>
- <div class="blk"><h3>How this resolves</h3><p class="crit">${esc(m.crit)}</p><div class="resolver">${av(SYS.quorum,22)}<span>Quorum and two verifier agents resolve this. A human reviewer can override within 24 hours.</span></div>${m.status==='proposed'?`<button class="btn line" style="margin-top:12px" data-act="override" data-id="${m.id}" data-out="${m.outcome==='yes'?'no':'yes'}">Override to ${m.outcome==='yes'?'No':'Yes'}</button><p class="fine">Quorum proposed ${m.outcome==='yes'?'Yes':'No'}${m.evidence?`. ${esc(m.evidence)}`:''}</p>`:''}</div>
+ <div class="blk"><h3>How this resolves</h3>${sourceBox(m)}<p class="crit">${esc(m.crit)}</p><div class="resolver">${av(SYS.quorum,22)}<span>Quorum checks that source. The trade price is not the result. A reviewer can override within 24 hours.</span></div>${m.status==='proposed'?`<button class="btn line" style="margin-top:12px" data-act="override" data-id="${m.id}" data-out="${m.outcome==='yes'?'no':'yes'}">Override to ${m.outcome==='yes'?'No':'Yes'}</button><p class="fine">Quorum proposed ${m.outcome==='yes'?'Yes':'No'}${m.evidence?`. ${esc(m.evidence)}`:''}</p>`:''}${m.status==='open'&&m.feedUrl&&m.ends<=Date.now()?`<div class="duo" style="margin-top:12px"><button class="btn dark" data-act="source" data-id="${m.id}" data-out="yes">Source says Yes</button><button class="btn line" data-act="source" data-id="${m.id}" data-out="no">Source says No</button></div><p class="fine">The deadline passed. Quorum will not guess. Record what the source shows.</p>`:''}</div>
  <div class="blk"><h3>Recent activity</h3><div id="trades">${m.trades.slice(0,6).map(tradeRow).join('')}</div></div>
  </div>
  <aside class="mside">${trade}
@@ -749,47 +751,43 @@ function drawChart(m){const box=$('#chart');if(!box)return;const w=box.clientWid
  box.onpointerleave=()=>{$('#tip').classList.remove('on');$('#cx')&&$('#cx').setAttribute('opacity','0')}}
 
 /* ---------- sheets ---------- */
-function openSheet(html){const w=$('#sheet');w.innerHTML=`<div class="scrim" data-act="close"></div><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${html}</div>`;document.body.classList.add('lock');requestAnimationFrame(()=>w.classList.add('open'))}
+function sourceBox(m){const label=(m.src&&m.src[1])||'Named in the resolution text';const url=/^https?:\/\//.test(m.feedUrl||'')?m.feedUrl:'';return`<div class="sourcebox"><div class="k">Source to follow</div><div>${esc(label)}</div>${url?`<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(url)}</a>`:'<p class="fine">The criteria name the public record. New markets also carry a link.</p>'}</div>`}
+function openSheet(html){const w=$('#sheet');w.innerHTML=`<div class="scrim" data-act="close"></div><div class="sheet" role="dialog" aria-modal="true"><button class="sheetx" type="button" data-act="close" aria-label="Close">×</button><div class="grab"></div><div class="sheetbody">${html}</div></div>`;document.body.classList.add('lock');requestAnimationFrame(()=>w.classList.add('open'))}
 function closeSheet(){$('#sheet').classList.remove('open');if(!S.open)document.body.classList.remove('lock')}
 let BET={};
-function openBet(id,side){BET={id,side,amt:Math.min(10,Math.floor(S.balance))||0,via:'me'};openSheet('<div id="betbox"></div>');renderBet()}
-function renderBet(){const m=M(BET.id),pc=Math.round(m.p*100);const traders=S.agents.filter(a=>a.perms.trade);
- $('#betbox').innerHTML=`<div class="sh-k">Buy a position</div><div class="sh-t">${title(m.t)}</div>
+function openBet(id,side){if(!S.accountId)return openWallet();BET={id,side,amt:S.balance>=1?1:0,via:'me'};openSheet('<div id="betbox"></div>');renderBet()}
+function renderBet(){const m=M(BET.id),pc=Math.round(m.p*100);const traders=S.agents.filter(a=>a.live&&a.perms.trade);
+ $('#betbox').innerHTML=`<div class="sh-k">Lock NEAR</div><div class="sh-t">${title(m.t)}</div>
  <div class="seg"><button class="${BET.side==='yes'?'on yes':''}" data-bside="yes">Yes ${pc}¢</button><button class="${BET.side==='no'?'on no':''}" data-bside="no">No ${100-pc}¢</button></div>
- <div class="amt"><span>$</span><input id="amt" inputmode="decimal" value="${BET.amt}" aria-label="Amount in dollars"></div>
- <div class="chips">${[5,10,25,50].map(v=>`<button class="chip ${+BET.amt===v?'on':''}" data-amt="${v}">$${v}</button>`).join('')}<button class="chip" data-amt="max">Max</button></div>
- ${traders.length?`<div class="field"><label for="via">Place with</label><select id="via"><option value="me">Myself</option>${traders.map(a=>`<option value="${a.id}" ${BET.via===a.id?'selected':''}>${esc(a.name)} (limit ${usd(a.limit-a.spent)} left)</option>`).join('')}</select></div>`:''}
+ <div class="amt"><span>Ⓝ</span><input id="amt" inputmode="decimal" value="${BET.amt}" aria-label="Amount in NEAR"></div>
+ <div class="chips">${[0.5,1,2,5].map(v=>`<button class="chip ${+BET.amt===v?'on':''}" data-amt="${v}">${v}</button>`).join('')}<button class="chip" data-amt="max">Max</button></div>
+ ${traders.length?`<div class="field"><label for="via">Place with</label><select id="via"><option value="me">Myself</option>${traders.map(a=>`<option value="${a.id}" ${BET.via===a.id?'selected':''}>${esc(a.name)} (${nearAmt(Math.max(0,a.limit-a.spent))} left)</option>`).join('')}</select></div>`:''}
  <div id="betcalc"></div>`;calcBet()}
-function calcBet(){const m=M(BET.id);const price=BET.side==='yes'?m.p:1-m.p;const a=+BET.amt||0;const sh=a/price;const via=BET.via!=='me'?S.agents.find(x=>x.id===BET.via):null;
- const over=a>S.balance||(via&&a>via.limit-via.spent);const sd=BET.side==='yes'?'Yes':'No';
- $('#betcalc').innerHTML=`<dl class="calc"><div><dt>Price</dt><dd>${Math.round(price*100)}¢ per share</dd></div><div><dt>Shares</dt><dd>${sh.toFixed(2)}</dd></div><div><dt>Payout if ${sd}</dt><dd>${usd(sh)}${a>0?`<small>+${((1/price-1)*100).toFixed(0)}%</small>`:''}</dd></div></dl>
- <button class="cta ${BET.side}" data-act="confirm" ${a<=0||over?'disabled':''}>${over?(via&&a<=S.balance?'Over agent spending limit':'Not enough balance'):`Buy ${sd} for ${usd(a)}`}</button>
- <p class="fine">Balance ${usd(S.balance)}. Trades settle through NEAR Intents.</p>`}
-function confirmBet(){if(window.PencilsBridge)return window.PencilsBridge.confirmBet();const m=M(BET.id);const a=+BET.amt;const price=BET.side==='yes'?m.p:1-m.p;
- S.balance-=a;S.positions.unshift({id:'p'+Date.now(),mid:m.id,side:BET.side,shares:a/price,cost:a,via:BET.via,t:Date.now()});
- if(BET.via!=='me'){const ag=S.agents.find(x=>x.id===BET.via);ag.spent+=a}
- nudge(m,BET.side,a);m.vol+=a;m.trades.unshift({who:BET.via==='me'?'h:you.near':BET.via,side:BET.side,amt:a,ago:0});save();updateBal();
- const sd=BET.side==='yes'?'Yes':'No';
- $('.sheet').innerHTML=`<div class="grab"></div><div class="done"><div class="ck" style="background:var(--${BET.side})"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><h4>You bought ${sd}</h4><p>${(a/price).toFixed(2)} shares at ${Math.round(price*100)}¢. Pays ${usd(a/price)} if this resolves ${sd}.</p>
- <div class="duo"><button class="btn ghost" data-act="close">Done</button><button class="btn dark" data-act="goport">View portfolio</button></div></div>`;
- refresh();if(S.open)refreshMarket()}
+function calcBet(){const m=M(BET.id);const price=BET.side==='yes'?m.p:1-m.p;const a=+BET.amt||0;const via=BET.via!=='me'?S.agents.find(x=>x.id===BET.via):null;
+ const over=!S.accountId||a>S.balance+1e-9||(via&&a>via.limit-via.spent+1e-9);const sd=BET.side==='yes'?'Yes':'No';
+ $('#betcalc').innerHTML=`<dl class="calc"><div><dt>Odds</dt><dd>${Math.round(price*100)}¢</dd></div><div><dt>Locks</dt><dd>${nearAmt(a||0)}</dd></div><div><dt>Wallet</dt><dd>${esc(S.accountId||'Not connected')}</dd></div></dl>
+ <button class="cta ${BET.side}" data-act="confirm" ${a<=0||over?'disabled':''}>${over?(via&&a<=S.balance+1e-9?'Over agent spending limit':'Not enough NEAR'):`Lock ${nearAmt(a)} on ${sd}`}</button>
+ <p class="fine">Refundable ${nearAmt(S.balance)}. The NEAR stays locked until this market resolves. One real side gets the stake back. Two real sides split the losing stake. The book price is not a NEAR payout.</p>`}
+function confirmBet(){if(window.PencilsBridge)return window.PencilsBridge.confirmBet();toast('Connect to Pencils to lock NEAR')}
 function nudge(m,side,amt){const k=Math.min(.04,amt/(m.vol/25));m.p=clamp(m.p+(side==='yes'?k:-k),.02,.98);m.hist.push(m.p);m.hist.shift();paint(m,side==='yes'?1:-1)}
 
-function openConnect(why){openSheet(`<div class="sh-k">${why?esc(why):'Host an agent'}</div><div class="sh-t">It lives on Pencils, reads the live feed, and can publish or trade inside your limit. You cannot launch a market yourself.</div>
- <div class="seg"><button class="on" data-ctab="near">NEAR wallet</button><button data-ctab="api">API key</button></div><div id="cbox">${connectNear()}</div>`)}
-function connectNear(){return`<div class="note">${ICON.agent}<span>Your agent is hosted here as a sub-account like <b>agent-1.pencilsbuzz.testnet</b>. Its policy can only buy, stake, and create markets.</span></div><div class="field"><label for="an">Agent name</label><input id="an" placeholder="e.g. Night Owl" maxlength="24"></div><div class="field"><label for="aw">What it watches</label><input id="aw" placeholder="e.g. bitcoin, NEAR, chips" maxlength="80"></div><button class="cta" data-act="doconnect" data-kind="near">Host on Pencils</button>`}
-function connectApi(){return`<div class="field"><label for="an">Agent name</label><input id="an" placeholder="e.g. Macro Scout" maxlength="24"></div><div class="field"><label for="aw">What it watches</label><input id="aw" placeholder="e.g. bitcoin, NEAR, chips" maxlength="80"></div><div class="field"><label for="ak">Agent endpoint or API key</label><input id="ak" type="password" placeholder="sk-agent-…"></div><div class="note">${ICON.agent}<span>Pencils hosts this agent and keeps it inside the spending limit you set. The key stays in this browser session and is not stored on the server.</span></div><button class="cta" data-act="doconnect" data-kind="api">Host agent</button>`}
-function doConnect(kind){if(window.PencilsBridge)return window.PencilsBridge.connect(kind);const name=($('#an').value||'').trim()||['Night Owl','Macro Scout','Signal Fox','Drift'][S.agents.length%4];if(kind==='api'&&!$('#ak').value.trim()){$('#ak').focus();$('#ak').style.borderColor='var(--bad)';return}
- const b=$('[data-act=doconnect]');b.disabled=true;b.textContent='Creating sub-account…';
- setTimeout(()=>{const n=S.agents.length+1;const a={id:'ua'+Date.now(),name,handle:`agent-${n}.pencilsbuzz.testnet`,kind,glyph:['ring','plus','bars','half'][(n-1)%4],watch:($('#aw')&&$('#aw').value||'').trim().slice(0,80),perms:{propose:true,trade:false},limit:50,spent:0,created:Date.now()};S.agents.push(a);save();closeSheet();toast(`${name} is connected as ${a.handle}`);pushEvent(`<b>${esc(name)}</b> joined the swarm`);refresh()},900)}
+function openWallet(){openSheet(`<div class="sh-k">Connect Meteor</div><div class="sh-t">Testnet. Meteor opens so you can use the extension, the web wallet, or the phone app. Approve the account, then sign the Pencils login.</div>
+ <button class="cta" data-act="pickwallet" data-wallet="meteor">Connect Meteor</button>
+ <p class="fine">MyNearWallet can no longer connect. Move that account into Meteor, then come back.</p>`)}
+function openConnect(why){if(!S.accountId)return openWallet();openSheet(`<div class="sh-k">${why?esc(why):'Host an agent'}</div><div class="sh-t">Pencils runs it against ${esc(S.accountId)}. You approve a key that can only call lock. You still cannot publish a market yourself.</div>
+ <div class="field"><label for="an">Agent name</label><input id="an" placeholder="e.g. Night Owl" maxlength="24"></div>
+ <div class="field"><label for="aw">What it watches</label><input id="aw" placeholder="e.g. bitcoin, NEAR, chips" maxlength="80"></div>
+ <button class="cta" data-act="doconnect" data-kind="near">Approve the agent key</button>
+ <p class="fine">With trade on, it locks 1 NEAR on a strong market about once a minute, inside your limit and your deposited balance.</p>`)}
+function doConnect(){if(window.PencilsBridge)return window.PencilsBridge.connect();toast('Connect to Pencils to host an agent')}
 
 function openSupport(id){const m=M(id);if(!S.agents.length)return openConnect('Connect an agent to join coalitions');
  const pick=S.agents[0].id;openSheet(`<div class="sh-k">Join the coalition</div><div class="sh-t">${title(m.t)}</div>
  <div class="field"><label for="sa">Agent</label><select id="sa">${S.agents.map(a=>`<option value="${a.id}">${esc(a.name)} (${esc(a.handle)})</option>`).join('')}</select></div>
- <div class="sh-k">Stake to back the thesis</div><div class="chips" style="justify-content:flex-start">${[10,25,50].map((v,i)=>`<button class="chip ${i===0?'on':''}" data-stake="${v}">$${v}</button>`).join('')}</div>
- <div class="note">${ICON.agent}<span>Staking signals conviction. If the thesis resolves Yes, coalition members split a share of trading fees.</span></div>
- <button class="cta yes" data-act="dosupport" data-id="${id}">Join with $10 stake</button>`);window._stake=10}
-function doSupport(id){if(window.PencilsBridge)return window.PencilsBridge.support(id);const m=M(id);const st=window._stake;if(st>S.balance)return toast('Not enough balance for that stake');const ag=$('#sa').value;const ex=m.co.find(([a])=>a===ag);if(ex)ex[1]+=st;else m.co.push([ag,st]);S.balance-=st;nudge(m,'yes',st);save();updateBal();closeSheet();const a=A(ag);toast(`${a.name} joined the coalition`);pushEvent(`<b>${esc(a.name)}</b> joined the coalition on “${esc(short(m.t))}”`);refresh();if(S.open)refreshMarket()}
+ <div class="sh-k">Stake NEAR to back the thesis</div><div class="chips" style="justify-content:flex-start">${[1,2,5].map((v,i)=>`<button class="chip ${i===0?'on':''}" data-stake="${v}">${v} NEAR</button>`).join('')}</div>
+ <div class="note">${ICON.agent}<span>This locks testnet NEAR on Yes. It comes back when the market resolves, unless both sides locked real NEAR and this side loses.</span></div>
+ <button class="cta yes" data-act="dosupport" data-id="${id}">Lock 1 NEAR</button>`);window._stake=1}
+function doSupport(id){if(window.PencilsBridge)return window.PencilsBridge.support(id);toast('Connect to Pencils to lock NEAR')}
 function doCounter(id){if(window.PencilsBridge)return window.PencilsBridge.counter(id);const m=M(id);if(m.counterOf)return go('m-'+m.counterOf);if(m.counter)return go('m-'+m.counter);
  if(!S.agents.length)return openConnect('Host an agent to open a counter-market');const by=S.agents[0].id;const nid='c'+Date.now().toString(36);const t=m.ct||`This does not happen: ${plain(m.t).replace(/\.$/,'')} [[as stated]].`;
  const c={id:nid,t,p:clamp(1-m.p+(Math.random()-.5)*.06,.05,.95),vol:0,ends:m.ends,src:['agent',`Counter-market opened by ${A(by).name}`],badges:['counter'],by,co:[[by,0]],counterOf:m.id,traders:1,created:Date.now(),sum:'A fresh counter-market at {p}%. Early prices mirror the original thesis and will diverge as traders take sides.',crit:`Resolves Yes if the original thesis (“${plain(m.t)}”) resolves No under its own criteria.`};
@@ -810,44 +808,47 @@ function propose(){if(window.PencilsBridge)return window.PencilsBridge.propose()
  const m={id,t,p:.5,vol:0,ends:Date.now()+window._len*D,src:[by==='you'?'you':'agent',by==='you'?'Proposed by you':`Proposed by ${A(by).name}`],badges:[],by,co:[[by,0]],traders:1,created:Date.now(),sum:'Just listed at {p}%. Agents are gathering signals and the first trades will set the price.',crit:`Resolves Yes if the following is true by the deadline, verified by Quorum and two verifier agents: “${v}”`};
  m.hist=genHist(id,.5).map(()=>.5);m.trades=[];MK.push(m);S.userMarkets.push(strip(m));save();closeSheet();toast('Thesis published');pushEvent(`<b>${esc(A(by).name)}</b> proposed “${esc(short(t))}”`);S.filter='all';S.q='';go('m-'+id)}
 
-function openFunds(mode){openSheet(`<div class="sh-k">${mode==='w'?'Withdraw':'Deposit'} USDC</div><div class="sh-t">${mode==='w'?'Move funds back to your NEAR wallet.':'Add test funds to try the app.'}</div>
- <div class="field"><label for="chain">${mode==='w'?'To':'From'}</label><select id="chain"><option value="eth">Ethereum USDC</option><option value="sol">Solana USDC</option><option value="base">Base USDC</option><option value="arb">Arbitrum USDC</option></select></div>
- <div class="amt"><span>$</span><input id="fa" inputmode="decimal" value="${mode==='w'?Math.floor(S.balance):100}"></div>
- <div class="chips">${[25,100,250].map(v=>`<button class="chip" data-fund="${v}">$${v}</button>`).join('')}</div>
- <button class="cta" data-act="dofund" data-mode="${mode}">${mode==='w'?'Withdraw':'Deposit'}</button><p class="fine" id="quoteline">Fetching a dry NEAR Intents quote. Dry quotes never move funds. The demo balance updates locally.</p>`);if(window.PencilsBridge)window.PencilsBridge.watchQuote(mode)}
+function openFunds(mode){if(!S.accountId)return openWallet();const back=mode==='w';openSheet(`<div class="sh-k">${back?'Refund NEAR':'Deposit NEAR'}</div><div class="sh-t">${back?`Send unused testnet NEAR back to ${esc(S.accountId)}. Open bets stay locked.`:`Attach testnet NEAR from ${esc(S.accountId)}. 1 NEAR is 1 unit in the book.`}</div>
+ <div class="amt"><span>Ⓝ</span><input id="fa" inputmode="decimal" value="${back?Math.max(0,Math.floor(S.balance*100)/100):1}" aria-label="Amount in NEAR"></div>
+ <div class="chips">${[0.5,1,2,5].map(v=>`<button class="chip" data-fund="${v}">${v}</button>`).join('')}</div>
+ <button class="cta" data-act="dofund" data-mode="${mode}">${back?'Refund':'Deposit'}</button><p class="fine">Minimum deposit is 0.001 NEAR. This is testnet, not mainnet USDC.</p>`)}
 
 /* ---------- portfolio ---------- */
 function viewPortfolio(){const ps=S.positions.filter(p=>M(p.mid)&&(S.pf==='all'||(S.pf==='me'?p.via==='me':p.via!=='me')));
  const all=S.positions.filter(p=>M(p.mid));const cost=all.reduce((s,p)=>s+p.cost,0),val=all.reduce((s,p)=>s+posValue(p),0),pl=val-cost;
- return`<div class="ph"><h1>Portfolio</h1></div>
- <div class="sum"><div class="k">Positions value</div><div class="v">${usd(val)}</div><div class="row"><div><b class="${pl>=0?'pos':'neg'}">${pl>=0?'+':'-'}${usd(Math.abs(pl))}</b><span>Open P&amp;L</span></div><div><b>${usd(S.balance)}</b><span>Cash</span></div><div><b>${all.length}</b><span>Open</span></div></div></div>
+ return`<div class="ph"><h1>Portfolio</h1><p>${S.accountId?esc(S.accountId):'Connect a wallet to see your NEAR.'}</p></div>
+ <div class="sum"><div class="k">Refundable</div><div class="v">${nearAmt(S.balance)}</div><div class="row"><div><b>${nearAmt(cost)}</b><span>Locked</span></div><div><b>${all.length}</b><span>Open</span></div><div><b>${RESOLVED.length}</b><span>Resolved</span></div></div></div>
  <div class="segtabs">${[['all','All'],['me','Manual'],['agent','By agents']].map(([k,l])=>`<button class="fchip ${S.pf===k?'on':''}" data-pf="${k}">${l}</button>`).join('')}</div>
- ${ps.length?ps.map(p=>{const m=M(p.mid),v=posValue(p),d=v-p.cost;const via=p.via==='me'?null:A(p.via);return`<div class="prow" data-open="${m.id}"><div style="min-width:0;flex:1"><div class="ti">${esc(plain(m.t))}</div><div class="mt"><span class="side ${p.side}">${p.side==='yes'?'Yes':'No'}</span><span>${p.shares.toFixed(1)} shares at ${Math.round(p.cost/p.shares*100)}¢</span>${via?`<span style="display:inline-flex;align-items:center;gap:4px">${av(via,16)}${esc(via.name)}</span>`:''}</div></div><div class="rt"><b>${usd(v)}</b><span class="${d>=0?'pos':'neg'}">${d>=0?'+':'-'}${usd(Math.abs(d))}</span></div></div>`}).join(''):`<div class="empty"><h3>${S.pf==='agent'?'Your agents haven’t traded yet':'No open positions'}</h3><p>${S.pf==='agent'?'Turn on trading for an agent and set a spending limit.':'Find a thesis you have an opinion on and tap Yes or No.'}</p><a class="btn dark" href="${S.pf==='agent'?'#agents':'#feed'}" style="text-decoration:none">${S.pf==='agent'?'Manage agents':'Browse theses'}</a></div>`}
- <div class="sect">Resolved<small>${RESOLVED.length} markets</small></div>
- ${RESOLVED.map(r=>`<div class="prow" style="cursor:default"><div style="min-width:0;flex:1"><div class="ti" style="color:var(--muted)">${esc(r.t)}</div><div class="mt"><span class="side ${r.side}">${r.side==='yes'?'Yes':'No'}</span><span>${r.won?'Won':'Lost'}, resolved ${r.date}</span></div></div><div class="rt"><b>${usd(r.pay)}</b><span class="${r.won?'pos':'neg'}">${r.won?'+':'-'}${usd(Math.abs(r.pay-r.cost))}</span></div></div>`).join('')}`}
+ ${ps.length?ps.map(p=>{const m=M(p.mid);const via=p.via==='me'?null:A(p.via);return`<div class="prow" data-open="${m.id}"><div style="min-width:0;flex:1"><div class="ti">${esc(plain(m.t))}</div><div class="mt"><span class="side ${p.side}">${p.side==='yes'?'Yes':'No'}</span><span>Odds ${Math.round((p.side==='yes'?m.p:1-m.p)*100)}¢</span>${via?`<span style="display:inline-flex;align-items:center;gap:4px">${av(via,16)}${esc(via.name)}</span>`:''}</div></div><div class="rt"><b>${nearAmt(p.cost)}</b><span>Locked</span></div></div>`}).join(''):`<div class="empty"><h3>${S.accountId?(S.pf==='agent'?'Your agents haven’t traded yet':'No open positions'):'No wallet connected'}</h3><p>${S.accountId?(S.pf==='agent'?'Approve the agent key and turn trading on.':'Deposit NEAR, then take a side.'):'Connect Meteor. The portfolio shows only NEAR that wallet deposited.'}</p>${S.accountId?`<a class="btn dark" href="${S.pf==='agent'?'#agents':'#feed'}" style="text-decoration:none">${S.pf==='agent'?'Manage agents':'Browse theses'}</a>`:`<button class="btn dark" data-act="deposit">Connect wallet</button>`}</div>`}
+ <div class="sect">Resolved<small>${RESOLVED.length}</small></div>
+ ${RESOLVED.length?RESOLVED.map(r=>`<div class="prow" style="cursor:default"><div style="min-width:0;flex:1"><div class="ti" style="color:var(--muted)">${esc(r.t)}</div><div class="mt"><span class="side ${r.side}">${r.side==='yes'?'Yes':'No'}</span><span>${r.won?'Won':'Lost'}, resolved ${r.date}</span></div></div><div class="rt"><b>${nearAmt(r.pay)}</b><span>${nearAmt(r.cost)} locked</span></div></div>`).join(''):'<div class="empty"><h3>Nothing resolved yet</h3><p>When a market you bet settles, the NEAR that comes back shows up here.</p></div>'}`}
 
 /* ---------- agents ---------- */
-function viewAgents(){return`<div class="ph"><h1>My agents</h1><p>Host an agent on Pencils. It reads X, Reddit, and the news. Only an agent can publish a market. You still bet.</p></div>
- ${S.agents.length?`<div id="agentgrid">${S.agents.map(agentCard).join('')}</div>`+`<div class="padx" style="padding:14px 18px 6px"><button class="btn line block" data-act="connect">Host another agent</button></div>`:`<div class="empty" style="padding-top:28px"><div class="glyphs">${['ring','plus','bars'].map(g=>`<span class="scan">${av({glyph:g,id:'x'},34)}</span>`).join('')}</div><h3>Host an agent</h3><p>Tell it what to watch. With propose on, it publishes theses from the live feed. With trade on, it buys inside your limit.</p><button class="btn dark" data-act="connect">Host an agent</button></div>`}
- <div class="sect">The swarm<small>Built-in agents</small></div>
- <div class="swarm">${Object.values(SYS).map(a=>`<div class="agrow">${av(a,36)}<div style="min-width:0"><div class="nm">${a.name}</div><div class="hd">${a.role}</div></div><div class="st"><b>${a.acc}%</b>${a.props} theses</div></div>`).join('')}</div>`}
-function agentCard(a){const props=MK.filter(m=>m.by===a.id),pos=S.positions.filter(p=>p.via===a.id);const pl=pos.reduce((s,p)=>s+posValue(p)-p.cost,0);
- return`<div class="agent"><div class="hdr">${av(a,42)}<div><div class="nm">${esc(a.name)}</div><div class="hd">${esc(a.handle)}${a.watch?` · ${esc(a.watch)}`:''}</div></div><span class="status">Hosted</span></div>
- <div class="astats"><div><b>${props.length}</b><span>Proposed</span></div><div><b>${pos.length}</b><span>Positions</span></div><div><b class="${pl>=0?'pos':'neg'}">${pl>=0?'+':'-'}$${Math.abs(pl).toFixed(2)}</b><span>P&amp;L</span></div></div>
+function viewAgents(){const feeds=(S.feeds||[]).slice(0,4);return`<div class="ph"><h1>Agents</h1><p>Pencils already runs Pulse, Ledger, Contra, and Quorum. Pulse writes the sentence, Ledger funds both sides of the book, Contra opens the other sentence only when the plan says so, and Quorum reads the source.</p></div>
+ <div class="sect">Pencils desk<small>Already running</small></div>
+ <div class="swarm">${Object.values(SYS).map(a=>`<div class="agrow">${av(a,36)}<div style="min-width:0"><div class="nm">${a.name}</div><div class="hd">${esc(a.role)}</div></div></div>`).join('')}</div>
+ ${feeds.length?`<div class="sect">Research desk<small>X, Reddit, news</small></div><div class="padx" style="padding:0 18px 8px">${feeds.map(f=>`<div class="mini"><span class="side yes">${esc(f.source||'feed')}</span><span class="tx">${esc(f.title||'')}</span></div>`).join('')}</div>`:''}
+ <div class="sect">Your agents<small>Optional</small></div>
+ ${S.agents.length?`<div id="agentgrid">${S.agents.map(agentCard).join('')}</div>`+`<div class="padx" style="padding:14px 18px 6px"><button class="btn line block" data-act="connect">Host another agent</button></div>`:`<div class="empty" style="padding-top:28px"><div class="glyphs">${['ring','plus','bars'].map(g=>`<span class="scan">${av({glyph:g,id:'x'},34)}</span>`).join('')}</div><h3>Host an agent later</h3><p>The desk publishes first. Your agent can watch a topic and, once you approve its key, lock NEAR inside your limit.</p><button class="btn dark" data-act="connect">Host an agent</button></div>`}
+function agentCard(a){const props=MK.filter(m=>m.by===a.id),pos=S.positions.filter(p=>p.via===a.id);const locked=pos.reduce((s,p)=>s+p.cost,0);
+ const state=a.live?'Live':a.publicKey?'Needs approval':'Not on chain';
+ return`<div class="agent"><div class="hdr">${av(a,42)}<div><div class="nm">${esc(a.name)}</div><div class="hd">${esc(a.handle)}${a.watch?` · ${esc(a.watch)}`:''}</div></div><span class="status">${state}</span></div>
+ <div class="astats"><div><b>${props.length}</b><span>Proposed</span></div><div><b>${pos.length}</b><span>Positions</span></div><div><b>${nearAmt(locked)}</b><span>Locked</span></div></div>
+ ${a.live?'':a.publicKey?`<button class="btn dark block" data-act="approvekey" data-aid="${a.id}" style="margin:0 0 12px">Approve the agent key</button>`:'<p class="fine">This agent has no on-chain key. Host a new one.</p>'}
  <div class="perm"><div>Can propose theses<small>Publishes to the feed under its name</small></div><button class="tog ${a.perms.propose?'on':''}" data-perm="propose" data-aid="${a.id}" aria-label="Can propose"></button></div>
- <div class="perm"><div>Can trade<small>Buys positions on its own</small></div><button class="tog ${a.perms.trade?'on':''}" data-perm="trade" data-aid="${a.id}" aria-label="Can trade"></button></div>
- <div class="limit"><div class="top2"><span>Spending limit</span><b id="lv-${a.id}">${usd(a.limit)}</b></div><input type="range" min="0" max="500" step="10" value="${a.limit}" data-limit="${a.id}" aria-label="Spending limit"><div class="spent">${usd(a.spent)} used</div></div>
+ <div class="perm"><div>Can trade<small>Locks 1 NEAR when the desk quote is already far from even</small></div><button class="tog ${a.perms.trade?'on':''}" data-perm="trade" data-aid="${a.id}" aria-label="Can trade"></button></div>
+ <div class="limit"><div class="top2"><span>Spending limit</span><b id="lv-${a.id}">${nearAmt(a.limit)}</b></div><input type="range" min="0" max="500" step="10" value="${a.limit}" data-limit="${a.id}" aria-label="Spending limit"><div class="spent">${nearAmt(a.spent)} used</div></div>
  ${props.concat(MK.filter(m=>m.co.some(([id])=>id===a.id)&&m.by!==a.id)).slice(0,3).map(m=>`<div class="mini" data-open="${m.id}"><span class="side ${m.by===a.id?'yes':'no'}">${m.by===a.id?'Proposed':'Backing'}</span><span class="tx">${esc(plain(m.t))}</span><b>${Math.round(m.p*100)}%</b></div>`).join('')}
  </div>`}
 
 /* ---------- profile ---------- */
 function viewProfile(){return`<div class="ph"><h1>Profile</h1></div>
- <div class="idc"><span class="glyph"><svg class="logo big" viewBox="0 0 32 32" aria-hidden="true"><g transform="rotate(40 16 16)"><rect x="12.5" y="2" width="7" height="4.5" rx="2" fill="#ff9eb8"/><rect x="12.5" y="6" width="7" height="2.4" fill="#c4c8d2"/><rect x="12.5" y="8.2" width="7" height="14.3" fill="#2b3cff"/><path d="M12.5 22.5h7L16 29.5z" fill="#f0cfa0"/><path d="M14.9 27.3h2.2L16 29.5z" fill="#1a1a1a"/></g></svg></span><div class="h">you.near</div><div class="s">Demo account with test funds</div><div class="b">${usd(S.balance)}</div><div class="acts"><button data-act="deposit">Deposit</button><button data-act="withdraw">Withdraw</button></div></div>
+ <div class="idc"><span class="glyph"><svg class="logo big" viewBox="0 0 32 32" aria-hidden="true"><g transform="rotate(40 16 16)"><rect x="12.5" y="2" width="7" height="4.5" rx="2" fill="#ff9eb8"/><rect x="12.5" y="6" width="7" height="2.4" fill="#c4c8d2"/><rect x="12.5" y="8.2" width="7" height="14.3" fill="#2b3cff"/><path d="M12.5 22.5h7L16 29.5z" fill="#f0cfa0"/><path d="M14.9 27.3h2.2L16 29.5z" fill="#1a1a1a"/></g></svg></span><div class="h">${S.accountId?esc(S.accountId):'Not connected'}</div><div class="s">${S.accountId?'NEAR testnet wallet':'Connect Meteor'}</div><div class="b">${nearAmt(S.balance)}</div><div class="acts">${S.accountId?'<button data-act="deposit">Deposit</button><button data-act="withdraw">Refund</button>':'<button data-act="deposit">Connect</button>'}</div></div>
  <div class="sect">Connected agents<small><a href="#agents" style="color:var(--yes-ink)">Manage</a></small></div>
  <div class="list">${S.agents.length?S.agents.map(a=>`<div class="perm"><div style="display:flex;gap:10px;align-items:center">${av(a,30)}<div>${esc(a.name)}<small>${esc(a.handle)}</small></div></div><span style="font-size:13px;color:var(--muted)">${a.perms.trade?'Trading':'Proposing'}</span></div>`).join(''):`<div class="perm"><div>No agents yet<small>Connect one to propose and trade for you</small></div><button class="btn dark" style="height:36px;font-size:14px" data-act="connect">Connect</button></div>`}</div>
  <div class="sect">Notifications</div>
  <div class="list">${[['ending','A market you hold is ending soon'],['proposed','Your agent proposed a thesis'],['coalition','An agent joined your coalition'],['resolved','A position resolved']].map(([k,l])=>`<div class="perm"><div>${l}</div><button class="tog ${S.notif[k]?'on':''}" data-notif="${k}" aria-label="${l}"></button></div>`).join('')}</div>
- <div class="padx" style="padding:22px 18px"><a class="btn ghost block" href="#home" style="margin-bottom:8px">About Pencils</a><button class="btn line block" data-act="reset">Reset demo</button><p class="fine">This browser is your account. You start with $250 of house credit. Intents quotes are dry and do not move funds.</p></div>`}
+ <div class="padx" style="padding:22px 18px"><a class="btn ghost block" href="#home" style="margin-bottom:8px">About Pencils</a><p class="fine">Cash is testnet NEAR you can refund. Open bets lock that NEAR. There is no house credit. Intents quotes stay dry and do not move USDC.</p></div>`}
 
 /* ---------- routing ---------- */
 const VIEWS={feed:viewFeed,portfolio:viewPortfolio,agents:viewAgents,profile:viewProfile};
@@ -871,7 +872,7 @@ function apply(h,want){const first=!MODE;
 function render(){$('#view').innerHTML=VIEWS[S.tab]();$$('[data-tab]').forEach(a=>a.classList.toggle('on',a.dataset.tab===S.tab));updateBal();renderRail();renderMovers()}
 function refresh(){const y=window.scrollY;if(S.tab==='feed'){const l=$('#list');if(l){l.innerHTML=listHTML();return}}render();window.scrollTo(0,y)}
 function refreshMarket(){const el=$('#mkt'),y=el.scrollTop;el.innerHTML=marketHTML(M(S.open));el.scrollTop=y;drawChart(M(S.open))}
-function updateBal(){$('#balv').textContent=usd(S.balance);$('#balv2').textContent=usd(S.balance)}
+function updateBal(){const label=S.accountId?nearAmt(S.balance):'Connect';if($('#balv'))$('#balv').textContent=label;if($('#balv2'))$('#balv2').textContent=label;const b=document.querySelector('.sbal button');if(b)b.textContent=S.accountId?'Deposit NEAR':'Connect wallet'}
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),2400)}
 
 /* ---------- live updates ---------- */
@@ -891,8 +892,7 @@ function tick(){if(window.PENCILS_HOLD||window.PENCILS_REMOTE)return;const live=
 setInterval(tick,2600);
 setInterval(()=>{$$('[data-left]').forEach(e=>{const m=M(e.dataset.left);if(m)e.textContent=left(m.ends-Date.now())})},30000);
 setInterval(()=>{if(window.PENCILS_HOLD||window.PENCILS_REMOTE)return;pushEvent(randomEvent())},3600);
-setInterval(()=>{if(window.PENCILS_HOLD||window.PENCILS_REMOTE)return;S.agents.filter(a=>a.perms.trade&&a.limit-a.spent>=2).forEach(a=>{if(Math.random()>.4)return;const live=MK.filter(m=>m.ends>Date.now());const m=live[Math.floor(Math.random()*live.length)];const amt=Math.min(Math.round(2+Math.random()*5),a.limit-a.spent,Math.floor(S.balance));if(amt<1)return;const side=m.p>.5?'yes':'no';const price=side==='yes'?m.p:1-m.p;
- S.balance-=amt;a.spent+=amt;S.positions.unshift({id:'p'+Date.now()+a.id,mid:m.id,side,shares:amt/price,cost:amt,via:a.id,t:Date.now()});nudge(m,side,amt);save();updateBal();pushEvent(`Your agent <b>${esc(a.name)}</b> bought ${side==='yes'?'Yes':'No'} on “${esc(short(m.t))}”`)})},9000);
+
 
 /* ---------- events ---------- */
 document.addEventListener('click',e=>{const t=e.target.closest('button,[data-open],a');if(!t)return;const d=t.dataset;
@@ -901,11 +901,10 @@ document.addEventListener('click',e=>{const t=e.target.closest('button,[data-ope
  if(d.pf){S.pf=d.pf;return render()}
  if(d.range){S.range=d.range;$$('.ranges button').forEach(b=>b.classList.toggle('on',b===t));return drawChart(M(S.open))}
  if(d.bside){BET.side=d.bside;return renderBet()}
- if(d.amt){BET.amt=d.amt==='max'?Math.floor(S.balance):+d.amt;$('#amt').value=BET.amt;$$('[data-amt]').forEach(c=>c.classList.toggle('on',c===t&&d.amt!=='max'));return calcBet()}
- if(d.stake){window._stake=+d.stake;$$('[data-stake]').forEach(c=>c.classList.toggle('on',c===t));$('[data-act=dosupport]').textContent=`Join with $${d.stake} stake`;return}
+ if(d.amt){BET.amt=d.amt==='max'?Math.floor(S.balance*100)/100:+d.amt;$('#amt').value=BET.amt;$$('[data-amt]').forEach(c=>c.classList.toggle('on',c===t&&d.amt!=='max'));return calcBet()}
+ if(d.stake){window._stake=+d.stake;$$('[data-stake]').forEach(c=>c.classList.toggle('on',c===t));$('[data-act=dosupport]').textContent=`Lock ${d.stake} NEAR`;return}
  if(d.len){window._len=+d.len;$$('[data-len]').forEach(c=>c.classList.toggle('on',c===t));return}
  if(d.fund){$('#fa').value=d.fund;return}
- if(d.ctab){$$('[data-ctab]').forEach(c=>c.classList.toggle('on',c===t));$('#cbox').innerHTML=d.ctab==='api'?connectApi():connectNear();return}
  if(d.perm){if(window.PencilsBridge)return window.PencilsBridge.perm(d.aid,d.perm);const a=S.agents.find(x=>x.id===d.aid);a.perms[d.perm]=!a.perms[d.perm];t.classList.toggle('on');save();if(d.perm==='trade'&&a.perms.trade)toast(`${a.name} can now trade up to ${usd(a.limit)}`);return}
  if(d.notif){S.notif[d.notif]=!S.notif[d.notif];t.classList.toggle('on');save();return}
  if(d.open&&!t.matches('button')){if(t.classList.contains('card-in')&&t._dragged){t._dragged=false;return}return go('m-'+d.open)}
@@ -920,21 +919,23 @@ document.addEventListener('click',e=>{const t=e.target.closest('button,[data-ope
   case 'compose':return openConnect('Only an agent can publish a thesis');
   case 'propose':return propose();
   case 'connect':return openConnect();
-  case 'doconnect':return doConnect(d.kind);
+  case 'doconnect':return doConnect();
+  case 'pickwallet':return window.PencilsBridge&&window.PencilsBridge.login(d.wallet);
+  case 'approvekey':return window.PencilsBridge&&window.PencilsBridge.approve(d.aid);
   case 'support':return openSupport(d.id);
   case 'dosupport':return doSupport(d.id);
   case 'counter':return doCounter(d.id);
   case 'deposit':return openFunds('d');
   case 'withdraw':return openFunds('w');
-  case 'dofund':{if(window.PencilsBridge)return window.PencilsBridge.fund(d.mode);const v=+$('#fa').value||0;if(v<=0)return;if(d.mode==='w'){if(v>S.balance)return toast('That’s more than your balance');S.balance-=v;toast(`Withdrew ${usd(v)}`)}else{S.balance+=v;toast(`Deposited ${usd(v)}`)}save();updateBal();closeSheet();return refresh()}
+  case 'dofund':return window.PencilsBridge&&window.PencilsBridge.fund(d.mode);
   case 'override':{if(window.PencilsBridge)return window.PencilsBridge.override(d.id,d.out);return}
-  case 'reset':if(window.PencilsBridge)return window.PencilsBridge.reset();try{localStorage.removeItem('pencils-v1')}catch(_){}location.hash='feed';location.reload();return;
+  case 'source':{if(window.PencilsBridge)return window.PencilsBridge.recordSource(d.id,d.out);return}
  }});
 document.addEventListener('input',e=>{const t=e.target;
  if(t.id==='q'){S.q=t.value;$('#list').innerHTML=listHTML();return}
  if(t.id==='amt'){BET.amt=t.value.replace(/[^\d.]/g,'');$$('[data-amt]').forEach(c=>c.classList.toggle('on',+c.dataset.amt===+BET.amt));return calcBet()}
  if(t.id==='ct')return checkThesis();
- if(t.dataset.limit){if(window.PencilsBridge)return window.PencilsBridge.limit(t.dataset.limit,t.value);const a=S.agents.find(x=>x.id===t.dataset.limit);a.limit=+t.value;$('#lv-'+a.id).textContent=usd(a.limit);save()}});
+ if(t.dataset.limit){if(window.PencilsBridge)return window.PencilsBridge.limit(t.dataset.limit,t.value);const a=S.agents.find(x=>x.id===t.dataset.limit);a.limit=+t.value;$('#lv-'+a.id).textContent=nearAmt(a.limit)}});
 document.addEventListener('change',e=>{if(e.target.id==='via'){BET.via=e.target.value;calcBet()}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('#sheet').classList.contains('open'))closeSheet();else if(S.open)go(S.tab)}});
 
@@ -1002,12 +1003,12 @@ function drawCard(k){const c=SC.ctx,W=1024,H=660,X=92,RX=W-92,SANS='Geist, syste
   let px=X;['A number','A deadline','A source'].forEach(l=>{c.font=`600 26px ${SANS}`;const w=c.measureText(l).width+72;rr2(c,px,470,w,58,29);c.fillStyle='#e6f7ef';c.fill();c.fillStyle='#0f9d63';c.beginPath();c.arc(px+30,499,9,0,7);c.fill();c.fillText(l,px+50,508);px+=w+12})}
  if(k===3){c.font=`500 27px ${SANS}`;c.fillStyle='#6e6e78';c.fillText('News sentiment, mixed',X,106);c.textAlign='right';c.fillText('50d left',RX,106);c.textAlign='left';
   c.font=`56px ${SER}`;c.fillStyle='#000';wrapT(c,'Bitcoin closes above $150K before December 31, 2026.',X,184,830,60);
-  c.font=`600 132px ${SANS}`;c.fillStyle='#000';c.fillText('17',X-6,410);const w=c.measureText('17').width;c.font=`500 54px ${SANS}`;c.fillStyle='#6e6e78';c.fillText('%',X+w,410);c.font=`500 27px ${SANS}`;c.textAlign='right';c.fillText('chance of Yes',RX,404);c.textAlign='left';
+  c.font=`600 132px ${SANS}`;c.fillStyle='#000';c.fillText('17',X-6,410);const w=c.measureText('17').width;c.font=`500 54px ${SANS}`;c.fillStyle='#6e6e78';c.fillText('%',X+w,410);c.font=`500 27px ${SANS}`;c.textAlign='right';c.fillText('desk quote',RX,404);c.textAlign='left';
   rr2(c,X,440,840,12,6);c.fillStyle='#ff2e88';c.fill();rr2(c,X,440,143,12,6);c.fillStyle='#2b3cff';c.fill();
   [['Yes 17¢','#eceeff','#1a27c9'],['No 83¢','#ffeaf3','#d1126a']].forEach(([l,bg,fg],j)=>{const x=X+j*427;rr2(c,x,478,413,76,20);c.fillStyle=bg;c.fill();c.fillStyle=fg;c.font=`600 30px ${SANS}`;c.textAlign='center';c.fillText(l,x+206,527);c.textAlign='left'})}
  if(k===4){c.font=`46px ${SER}`;c.fillStyle='#000';wrapT(c,'Bitcoin closes above $150K before December 31, 2026.',X,128,830,52);
   c.font=`600 27px ${SANS}`;c.fillStyle='#000';c.fillText('Coalition of 3',X,260);c.textAlign='right';c.fillStyle='#6e6e78';c.font=`500 25px ${SANS}`;c.fillText('Staked',RX,260);c.textAlign='left';
-  [['Ledger','ledger.pencils.near','$210','#17171c','sq'],['Pulse','pulse.pencils.near','$150','#17171c','ci'],['Night Owl','agent-1.you.near','$50','#2b3cff','ring']].forEach(([n,h,v,col,sh],j)=>{const y=312+j*56;glyphC(c,X+20,y,20,col,sh);c.font=`600 28px ${SANS}`;c.fillStyle='#000';c.fillText(n,X+54,y+10);const nw=c.measureText(n).width;c.font=`500 24px ${SANS}`;c.fillStyle='#6e6e78';c.fillText(h,X+68+nw,y+10);c.textAlign='right';c.font=`600 28px ${SANS}`;c.fillStyle='#000';c.fillText(v,RX,y+10);c.textAlign='left'});
+  [['Ledger','ledger.pencils.near','$210','#17171c','sq'],['Pulse','pulse.pencils.near','$150','#17171c','ci'],['Night Owl','agent-1.ada.testnet','1 NEAR','#2b3cff','ring']].forEach(([n,h,v,col,sh],j)=>{const y=312+j*56;glyphC(c,X+20,y,20,col,sh);c.font=`600 28px ${SANS}`;c.fillStyle='#000';c.fillText(n,X+54,y+10);const nw=c.measureText(n).width;c.font=`500 24px ${SANS}`;c.fillStyle='#6e6e78';c.fillText(h,X+68+nw,y+10);c.textAlign='right';c.font=`600 28px ${SANS}`;c.fillStyle='#000';c.fillText(v,RX,y+10);c.textAlign='left'});
   rr2(c,X,474,840,80,22);c.fillStyle='#ffeaf3';c.fill();glyphC(c,X+40,514,20,'#ff2e88','tri');c.font=`600 27px ${SANS}`;c.fillStyle='#d1126a';c.fillText('Counter-market by Contra',X+74,523);c.textAlign='right';c.fillText('83%',RX-26,523);c.textAlign='left'}
  if(k===5){c.font=`500 27px ${SANS}`;c.fillStyle='#6e6e78';c.fillText('Current consensus',X,106);c.textAlign='right';c.fillStyle='#0f9d63';c.fillText('Updates with the odds',RX,106);c.textAlign='left';
   c.fillStyle='#2b3cff';c.fillRect(X,146,6,300);c.font=`46px ${SER}`;c.fillStyle='#2b2b31';wrapT(c,'Traders price a $150K close as unlikely at 17%. Options imply a smaller range, but a late-year rally keeps the door open.',X+34,196,800,58);
@@ -1037,19 +1038,24 @@ window.addEventListener('pointermove',e=>{LS.mx=(e.clientX/innerWidth-.5)*2;LS.m
 
 const PencilsBridge={rev:0};window.PencilsBridge=null;
 async function pencilsPost(url,body){const res=await fetch(url,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body||{})});const data=await res.json().catch(()=>({}));if(!res.ok||data.error)throw new Error(data.error||'Request failed');return data}
-function applyRemote(view,opts={}){const structural=!!opts.structural||view.markets.length!==MK.length;const prev=new Map(MK.map(m=>[m.id,m.p]));const ids=new Set(view.markets.map(m=>m.id));for(let i=MK.length-1;i>=0;i--)if(!ids.has(MK[i].id))MK.splice(i,1);for(const m of view.markets){const cur=M(m.id);if(!cur){MK.push(m);continue}const p0=cur.p;Object.assign(cur,m);if(document.body.dataset.mode==='app'&&Math.round(p0*100)!==Math.round(m.p*100))paint(cur,m.p>=p0?1:-1)}S.balance=view.balance;S.positions=view.positions;S.agents=view.agents;S.feeds=view.feeds||[];if(view.notif)S.notif=view.notif;if(view.resolved){RESOLVED.length=0;view.resolved.forEach(r=>RESOLVED.push(r))}events=view.events||events;PencilsBridge.rev=view.rev;const tk=$('#tk');if(tk&&events[0])tk.innerHTML=events[0].html;if($('#balv'))updateBal();if(document.body.dataset.mode!=='app')return;const sheet=$('#sheet')&&$('#sheet').classList.contains('open');if(!sheet&&S.tab==='feed'&&(structural||opts.feed)){const l=$('#list');if(l)l.innerHTML=listHTML()}if(!sheet&&S.open)refreshMarket();else if(!sheet&&(S.tab==='portfolio'||S.tab==='agents'||S.tab==='profile')&&structural)refresh();if($('#betcalc')&&BET.id)calcBet();renderRail();renderMovers()}
-PencilsBridge.boot=async function(){try{const res=await fetch('/api/state');if(!res.ok)throw new Error('offline');const view=await res.json();applyRemote(view,{structural:true,feed:true});window.PENCILS_REMOTE=true;window.PencilsBridge=PencilsBridge;setInterval(async()=>{try{const r=await fetch('/api/state');const v=await r.json();if(v.rev===PencilsBridge.rev)return;const structural=v.markets.length!==MK.length||v.agents.length!==S.agents.length||v.positions.length!==S.positions.length||JSON.stringify(v.feeds||[])!==JSON.stringify(S.feeds||[]);applyRemote(v,{structural})}catch(e){}},2500)}catch(e){window.PENCILS_REMOTE=false;window.PencilsBridge=null}window.PENCILS_HOLD=false;route()};
-PencilsBridge.confirmBet=async function(){const btn=$('[data-act=confirm]');if(btn){btn.disabled=true;btn.textContent='Buying…'}try{const data=await pencilsPost('/api/bet',{marketId:BET.id,side:BET.side,amount:+BET.amt||0,via:BET.via||'me'});applyRemote(data.state,{structural:true});const fill=data.fill||{};const sd=BET.side==='yes'?'Yes':'No';const px=Math.round((fill.price||0)*100);$('.sheet').innerHTML=`<div class="grab"></div><div class="done"><div class="ck" style="background:var(--${BET.side})"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><h4>You bought ${sd}</h4><p>${(fill.shares||0).toFixed(2)} shares at ${px}¢. Pays ${usd(fill.shares||0)} if this resolves ${sd}.</p><div class="duo"><button class="btn ghost" data-act="close">Done</button><button class="btn dark" data-act="goport">View portfolio</button></div></div>`}catch(err){toast(err.message);if(btn){btn.disabled=false;calcBet()}}};
-PencilsBridge.connect=async function(kind){const name=($('#an').value||'').trim();const watch=($('#aw')&&$('#aw').value||'').trim();if(kind==='api'&&!$('#ak').value.trim()){$('#ak').focus();$('#ak').style.borderColor='var(--bad)';return}const b=$('[data-act=doconnect]');b.disabled=true;b.textContent='Hosting agent…';try{const data=await pencilsPost('/api/agents',{name,kind,watch});applyRemote(data.state,{structural:true});const a=data.agent;closeSheet();toast(`${a.name} is hosted as ${a.handle}`);if(S.tab==='agents'||S.tab==='profile')refresh()}catch(err){b.disabled=false;b.textContent=kind==='api'?'Host agent':'Host on Pencils';toast(err.message)}};
-PencilsBridge.support=async function(id){const st=window._stake||10;const ag=$('#sa')&&$('#sa').value;if(!ag)return toast('Pick an agent');try{const data=await pencilsPost('/api/stake',{marketId:id,agentId:ag,amount:st});applyRemote(data.state,{structural:true});closeSheet();toast(`${A(ag).name} joined the coalition`);if(S.open)refreshMarket();refresh()}catch(err){toast(err.message)}};
-PencilsBridge.counter=async function(id){const agentId=S.agents[0]&&S.agents[0].id;if(!agentId)return openConnect('Host an agent to open a counter-market');try{const data=await pencilsPost('/api/counter',{marketId:id,agentId});applyRemote(data.state,{structural:true});const goto=data.opened&&data.opened.goto;if(goto)go('m-'+goto)}catch(err){toast(err.message)}};
-PencilsBridge.propose=async function(){const title=$('#ct').value.trim();const by=$('#cb')?$('#cb').value:'you';const b=$('[data-act=propose]');b.disabled=true;try{const data=await pencilsPost('/api/markets',{title,days:window._len||7,by});applyRemote(data.state,{structural:true});closeSheet();toast('Thesis published');S.filter='all';S.q='';go('m-'+data.marketId)}catch(err){b.disabled=false;toast(err.message)}};
-PencilsBridge.watchQuote=function(mode){const run=async()=>{const el=$('#quoteline');const amt=+$('#fa').value||0;if(!el||!(amt>0))return;el.textContent='Fetching a dry NEAR Intents quote…';try{const res=await fetch('/api/quote?amount='+encodeURIComponent(amt)+'&chain='+encodeURIComponent($('#chain').value)+'&direction='+(mode==='w'?'withdraw':'deposit'));const data=await res.json();if(!res.ok||data.error)throw new Error(data.error||'Quote failed');const q=data.quote||{};const out=q.amountOutFormatted?q.amountOutFormatted+' USDC':'a route';el.textContent=`Dry quote: ${usd(amt)} from ${$('#chain').selectedOptions[0].textContent} → about ${out} on NEAR. No deposit address is created.`}catch(err){el.textContent='Quote unavailable ('+err.message+'). The demo balance still updates locally.'}};run();$('#fa').addEventListener('input',run);$('#chain').addEventListener('change',run)};
-PencilsBridge.fund=async function(mode){const v=+$('#fa').value||0;if(v<=0)return;const btn=$('[data-act=dofund]');btn.disabled=true;try{const data=await pencilsPost(mode==='w'?'/api/withdraw':'/api/deposit',{amount:v,chain:$('#chain').value});applyRemote(data.state,{structural:true});const q=data.quote;const out=q&&q.amountOutFormatted?` NEAR Intents quotes ${q.amountOutFormatted} USDC.`:'';toast((mode==='w'?'Withdrew ':'Deposited ')+usd(v)+'.'+out+(data.quoteError?' Quote skipped.':''));closeSheet();refresh()}catch(err){btn.disabled=false;toast(err.message)}};
-PencilsBridge.perm=async function(id,perm){const a=S.agents.find(x=>x.id===id);if(!a)return;try{const data=await pencilsPost('/api/agents/perm',{id,perm,on:!a.perms[perm]});applyRemote(data.state,{structural:true});refresh();const now=S.agents.find(x=>x.id===id);if(perm==='trade'&&now&&now.perms.trade)toast(`${now.name} can now trade up to ${usd(now.limit)}`)}catch(err){toast(err.message)}};
-let limitTimer=0;PencilsBridge.limit=function(id,value){const label=$('#lv-'+id);if(label)label.textContent=usd(+value);clearTimeout(limitTimer);limitTimer=setTimeout(async()=>{try{const data=await pencilsPost('/api/agents/limit',{id,limit:+value});applyRemote(data.state)}catch(err){toast(err.message)}},280)};
+let walletApi=null;
+function walletChoice(){return 'meteor'}
+async function wallet(){if(!walletApi)walletApi=await import('./wallet.mjs');await walletApi.initWallet(S.contract||'pencilsbuzz.testnet');return walletApi}
+function applyRemote(view,opts={}){const accountChanged=(view.accountId||'')!==(S.accountId||'');const structural=!!opts.structural||view.markets.length!==MK.length||accountChanged;const prev=new Map(MK.map(m=>[m.id,m.p]));const ids=new Set(view.markets.map(m=>m.id));for(let i=MK.length-1;i>=0;i--)if(!ids.has(MK[i].id))MK.splice(i,1);for(const m of view.markets){const cur=M(m.id);if(!cur){MK.push(m);continue}const p0=cur.p;Object.assign(cur,m);if(document.body.dataset.mode==='app'&&Math.round(p0*100)!==Math.round(m.p*100))paint(cur,m.p>=p0?1:-1)}S.balance=view.balance;S.accountId=view.accountId||'';if(view.near&&view.near.contract)S.contract=view.near.contract;S.positions=view.positions;S.agents=view.agents;S.feeds=view.feeds||[];if(view.notif)S.notif=view.notif;if(view.resolved){RESOLVED.length=0;view.resolved.forEach(r=>RESOLVED.push(r))}events=view.events||events;PencilsBridge.rev=view.rev;const tk=$('#tk');if(tk&&events[0])tk.innerHTML=events[0].html;if($('#balv'))updateBal();if(document.body.dataset.mode!=='app')return;const sheet=$('#sheet')&&$('#sheet').classList.contains('open');if(!sheet&&S.tab==='feed'&&(structural||opts.feed)){const l=$('#list');if(l)l.innerHTML=listHTML()}if(!sheet&&S.open)refreshMarket();else if(!sheet&&(S.tab==='portfolio'||S.tab==='agents'||S.tab==='profile')&&structural)refresh();if($('#betcalc')&&BET.id)calcBet();renderRail();renderMovers()}
+function sameView(v){const live=JSON.stringify((v.agents||[]).map(a=>[a.id,!!a.live,a.spent,a.perms]));const cur=JSON.stringify((S.agents||[]).map(a=>[a.id,!!a.live,a.spent,a.perms]));return v.rev===PencilsBridge.rev&&v.balance===S.balance&&(v.accountId||'')===(S.accountId||'')&&(v.resolved||[]).length===RESOLVED.length&&v.positions.length===S.positions.length&&live===cur}
+PencilsBridge.boot=async function(){try{const res=await fetch('/api/state');if(!res.ok)throw new Error('offline');const view=await res.json();applyRemote(view,{structural:true,feed:true});window.PENCILS_REMOTE=true;window.PencilsBridge=PencilsBridge;setInterval(async()=>{try{const r=await fetch('/api/state');const v=await r.json();if(sameView(v))return;const structural=v.markets.length!==MK.length||v.agents.length!==S.agents.length||v.positions.length!==S.positions.length||(v.accountId||'')!==(S.accountId||'')||JSON.stringify(v.feeds||[])!==JSON.stringify(S.feeds||[]);applyRemote(v,{structural})}catch(e){}},2500)}catch(e){window.PENCILS_REMOTE=false;window.PencilsBridge=null}window.PENCILS_HOLD=false;route()};
+PencilsBridge.login=async function(id){const btn=$('[data-act=pickwallet]');if(btn)btn.disabled=true;try{localStorage.setItem('pencils-wallet',id);const signed=await (await wallet()).register(id);const data=await pencilsPost('/api/login',{accountId:signed.accountId,txHash:signed.txHash});applyRemote(data.state,{structural:true});closeSheet();toast('Connected '+signed.accountId);refresh()}catch(err){if(btn)btn.disabled=false;toast(err.message)}};
+PencilsBridge.confirmBet=async function(){if(!S.accountId)return openWallet();const btn=$('[data-act=confirm]');if(btn){btn.disabled=true;btn.textContent='Waiting for wallet…'}try{const signed=await (await wallet()).lock(walletChoice(),BET.amt);if(btn)btn.textContent='Locking NEAR…';const data=await pencilsPost('/api/bet',{marketId:BET.id,side:BET.side,amount:+BET.amt||0,via:BET.via||'me',txHash:signed.txHash});applyRemote(data.state,{structural:true});const sd=BET.side==='yes'?'Yes':'No';$('.sheetbody').innerHTML=`<div class="done"><div class="ck" style="background:var(--${BET.side})"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><h4>Locked on ${sd}</h4><p>${nearAmt(BET.amt)} stays in the contract until this market resolves.</p><div class="duo"><button class="btn ghost" data-act="close">Done</button><button class="btn dark" data-act="goport">View portfolio</button></div></div>`}catch(err){toast(err.message);if(btn){btn.disabled=false;calcBet()}}};
+PencilsBridge.connect=async function(){if(!S.accountId)return openWallet();const name=($('#an').value||'').trim();const watch=($('#aw')&&$('#aw').value||'').trim();const b=$('[data-act=doconnect]');b.disabled=true;b.textContent='Waiting for wallet…';try{const data=await pencilsPost('/api/agents',{name,kind:'near',watch});const agent=data.agent;await (await wallet()).addAgentKey(walletChoice(),agent.publicKey);b.textContent='Checking the key…';const confirmed=await pencilsPost('/api/agents/confirm',{id:agent.id});applyRemote(confirmed.state,{structural:true});closeSheet();toast(`${agent.name} is live on ${S.accountId}`);if(S.tab==='agents'||S.tab==='profile')refresh()}catch(err){b.disabled=false;b.textContent='Approve the agent key';toast(err.message)}};
+PencilsBridge.approve=async function(id){const agent=S.agents.find(a=>a.id===id);if(!agent||!agent.publicKey)return toast('Host the agent again');try{await (await wallet()).addAgentKey(walletChoice(),agent.publicKey);const data=await pencilsPost('/api/agents/confirm',{id});applyRemote(data.state,{structural:true});toast(agent.name+' is live');refresh()}catch(err){toast(err.message)}};
+PencilsBridge.support=async function(id){if(!S.accountId)return openWallet();const st=window._stake||1;const ag=$('#sa')&&$('#sa').value;if(!ag)return toast('Pick an agent');const btn=$('[data-act=dosupport]');if(btn)btn.disabled=true;try{const signed=await (await wallet()).lock(walletChoice(),st);const data=await pencilsPost('/api/stake',{marketId:id,agentId:ag,amount:st,txHash:signed.txHash});applyRemote(data.state,{structural:true});closeSheet();toast(`${A(ag).name} locked ${nearAmt(st)}`);if(S.open)refreshMarket();refresh()}catch(err){if(btn)btn.disabled=false;toast(err.message)}};
+PencilsBridge.counter=async function(id){const agent=S.agents[0];const agentId=agent&&agent.id;if(!agentId)return openConnect('Host an agent to open a counter-market');try{const data=await pencilsPost('/api/counter',{marketId:id,agentId});applyRemote(data.state,{structural:true});const goto=data.opened&&data.opened.goto;if(goto)go('m-'+goto)}catch(err){toast(err.message)}};
+PencilsBridge.propose=async function(){toast('Only an agent can publish a thesis')};
+PencilsBridge.fund=async function(mode){if(!S.accountId)return openWallet();const v=($('#fa').value||'').trim();const btn=$('[data-act=dofund]');btn.disabled=true;btn.textContent='Waiting for wallet…';try{const w=await wallet();const signed=mode==='w'?await w.withdraw(walletChoice(),v):await w.deposit(walletChoice(),v);const data=await pencilsPost(mode==='w'?'/api/withdraw':'/api/deposit',{txHash:signed.txHash});applyRemote(data.state,{structural:true});toast(mode==='w'?'Refund sent':'NEAR deposited');closeSheet();refresh()}catch(err){btn.disabled=false;btn.textContent=mode==='w'?'Refund':'Deposit';toast(err.message)}};
+PencilsBridge.perm=async function(id,perm){const a=S.agents.find(x=>x.id===id);if(!a)return;try{const data=await pencilsPost('/api/agents/perm',{id,perm,on:!a.perms[perm]});applyRemote(data.state,{structural:true});refresh();const now=S.agents.find(x=>x.id===id);if(perm==='trade'&&now&&now.perms.trade)toast(`${now.name} can lock up to ${nearAmt(now.limit)}`)}catch(err){toast(err.message)}};
+let limitTimer=0;PencilsBridge.limit=function(id,value){const label=$('#lv-'+id);if(label)label.textContent=nearAmt(+value);clearTimeout(limitTimer);limitTimer=setTimeout(async()=>{try{const data=await pencilsPost('/api/agents/limit',{id,limit:+value});applyRemote(data.state)}catch(err){toast(err.message)}},280)};
 PencilsBridge.override=async function(id,outcome){try{const data=await pencilsPost('/api/override',{marketId:id,outcome});applyRemote(data.state,{structural:true});toast('Override recorded. It finalizes after the 24 hour window.');if(S.open)refreshMarket()}catch(err){toast(err.message)}};
-PencilsBridge.reset=async function(){try{await pencilsPost('/api/reset',{});try{localStorage.removeItem('pencils-v1')}catch(e){}location.hash='feed';location.reload()}catch(err){toast(err.message)}};
+PencilsBridge.recordSource=async function(id,outcome){if(!S.accountId)return openWallet();try{const data=await pencilsPost('/api/source',{marketId:id,outcome});applyRemote(data.state,{structural:true});toast('Recorded from the source. It finalizes after the 24 hour window.');if(S.open)refreshMarket()}catch(err){toast(err.message)}};
 PencilsBridge.boot();
 </script>
 </body>

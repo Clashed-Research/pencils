@@ -61,6 +61,54 @@ export function freshPool() {
   };
 }
 
+// Deepen both reserves by the same collateral. Liabilities stay put, so the
+// deposit is book depth: it does not mint a position and it does not pay out.
+export function addBoth(pool, micro) {
+  if (micro <= 0n) throw new Error("Amount must be positive");
+  pool.yes += micro;
+  pool.no += micro;
+  pool.collateral += micro;
+  if (pool.yes + pool.yesLiab !== pool.collateral) throw new Error("YES solvency broken");
+  if (pool.no + pool.noLiab !== pool.collateral) throw new Error("NO solvency broken");
+  return pool;
+}
+
+// Move the spot toward `target` without spending more than `maxBudget` (gross).
+export function leanQuote(pool, target, maxBudget) {
+  if (maxBudget < SCALE) return 0n;
+  const clamped = Math.min(MAX_PRICE, Math.max(MIN_PRICE, Number(target)));
+  let left = maxBudget;
+  let spent = 0n;
+  for (let i = 0; i < 24 && left >= SCALE; i++) {
+    const p = spot(pool.yes, pool.no);
+    if (Math.abs(p - clamped) < 0.01) break;
+    const side = clamped > p ? "yes" : "no";
+    let step = left > 40n * SCALE ? 40n * SCALE : left;
+    let preview = null;
+    while (step >= SCALE) {
+      try {
+        preview = applyBuy(pool.yes, pool.no, step, side);
+      } catch {
+        step /= 2n;
+        continue;
+      }
+      const nextP = spot(preview.yes, preview.no);
+      const over = side === "yes" ? nextP > clamped + 0.01 : nextP < clamped - 0.01;
+      if (over && step > SCALE) {
+        step /= 2n;
+        preview = null;
+        continue;
+      }
+      break;
+    }
+    if (!preview || step < SCALE || step > left) break;
+    commitPool(pool, side, step);
+    spent += step;
+    left -= step;
+  }
+  return spent;
+}
+
 export function commitPool(pool, side, budget) {
   const next = applyBuy(pool.yes, pool.no, budget, side);
   pool.yes = next.yes;

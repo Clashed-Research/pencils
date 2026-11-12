@@ -4,7 +4,7 @@
 
 use near_sdk::json_types::U128;
 use near_sdk::store::IterableMap;
-use near_sdk::{env, near, require, AccountId};
+use near_sdk::{env, near, require, AccountId, NearToken, Promise};
 use pencils_market::{note_spend, Pool};
 
 const LIQ: u128 = pencils_market::LIQ;
@@ -33,6 +33,14 @@ pub struct Market {
 pub struct Position {
     pub yes_shares: u128,
     pub no_shares: u128,
+}
+
+#[near(serializers = [json])]
+pub struct Funds {
+    pub balance: U128,
+    pub escrow: U128,
+    pub locked: U128,
+    pub pending: U128,
 }
 
 #[derive(Clone)]
@@ -200,6 +208,141 @@ impl Pencils {
     pub fn get_market(&self, id: String) -> Option<Market> {
         self.markets.get(&id).cloned()
     }
+
+    /// Record a wallet login. The chain checks the signature; the app checks the receipt.
+    pub fn register(&mut self) {
+        env::log_str(&format!("pencils:register:{}", env::predecessor_account_id()));
+    }
+
+    /// 1 NEAR credits $1 (1_000_000 micro). The NEAR stays here until withdraw or settlement.
+    #[payable]
+    pub fn deposit(&mut self) {
+        let account = env::predecessor_account_id();
+        let yocto = env::attached_deposit().as_yoctonear();
+        let credit = yocto / YOCTO_PER_MICRO;
+        require!(credit >= 1_000, "Attach at least 0.001 NEAR");
+        let next = self.balances.get(&account).copied().unwrap_or(0) + credit;
+        self.balances.insert(account.clone(), next);
+        write_u128(&escrow_key(&account), read_u128(&escrow_key(&account)) + yocto);
+        env::log_str(&format!("pencils:deposit:{account}:{yocto}"));
+    }
+
+    /// Move available credit into a pending lock. The app claims it when the bet is recorded.
+    pub fn lock(&mut self, amount: U128) {
+        require!(amount.0 > 0, "Amount must be positive");
+        let account = env::predecessor_account_id();
+        let balance = self.balances.get(&account).copied().unwrap_or(0);
+        require!(balance >= amount.0, "Not enough balance");
+        let yocto = micro_to_yocto(amount.0);
+        let held = read_u128(&escrow_key(&account));
+        let busy = read_u128(&locked_key(&account)) + read_u128(&pending_key(&account));
+        require!(held >= busy + yocto, "Not enough NEAR");
+        self.balances.insert(account.clone(), balance - amount.0);
+        write_u128(&pending_key(&account), read_u128(&pending_key(&account)) + yocto);
+    }
+
+    /// The account owner accepts a pending lock after the bet is about to be recorded.
+    pub fn claim(&mut self, account: AccountId, amount: U128) {
+        self.assert_owner();
+        require!(amount.0 > 0, "Amount must be positive");
+        let yocto = micro_to_yocto(amount.0);
+        let pending = read_u128(&pending_key(&account));
+        require!(pending >= yocto, "Not enough pending");
+        write_u128(&pending_key(&account), pending - yocto);
+        write_u128(&locked_key(&account), read_u128(&locked_key(&account)) + yocto);
+    }
+
+    /// Return every unclaimed lock to the caller's available balance.
+    pub fn cancel(&mut self) {
+        let account = env::predecessor_account_id();
+        let pending = read_u128(&pending_key(&account));
+        if pending == 0 {
+            return;
+        }
+        let credit = pending / YOCTO_PER_MICRO;
+        write_u128(&pending_key(&account), 0);
+        let next = self.balances.get(&account).copied().unwrap_or(0) + credit;
+        self.balances.insert(account, next);
+    }
+
+    /// Send available NEAR back to the signing wallet. Unclaimed locks are returned first.
+    pub fn withdraw(&mut self, amount: U128) -> Promise {
+        let account = env::predecessor_account_id();
+        let pending = read_u128(&pending_key(&account));
+        if pending > 0 {
+            let credit = pending / YOCTO_PER_MICRO;
+            write_u128(&pending_key(&account), 0);
+            let next = self.balances.get(&account).copied().unwrap_or(0) + credit;
+            self.balances.insert(account.clone(), next);
+        }
+        require!(amount.0 > 0, "Amount must be positive");
+        let balance = self.balances.get(&account).copied().unwrap_or(0);
+        require!(balance >= amount.0, "Not enough balance");
+        let yocto = micro_to_yocto(amount.0);
+        let held = read_u128(&escrow_key(&account));
+        let locked = read_u128(&locked_key(&account));
+        require!(held >= locked + yocto, "NEAR is locked in open positions");
+        self.balances.insert(account.clone(), balance - amount.0);
+        write_u128(&escrow_key(&account), held - yocto);
+        Promise::new(account).transfer(NearToken::from_yoctonear(yocto))
+    }
+
+    /// Return locked NEAR to the user's available balance.
+    pub fn release(&mut self, account: AccountId, amount: U128) {
+        self.assert_owner();
+        require!(amount.0 > 0, "Amount must be positive");
+        let yocto = micro_to_yocto(amount.0);
+        let locked = read_u128(&locked_key(&account));
+        require!(locked >= yocto, "Not enough locked");
+        write_u128(&locked_key(&account), locked - yocto);
+        let next = self.balances.get(&account).copied().unwrap_or(0) + amount.0;
+        self.balances.insert(account, next);
+    }
+
+    /// Take a losing stake out of the user's escrow and into the settlement pot.
+    pub fn slash(&mut self, account: AccountId, amount: U128) {
+        self.assert_owner();
+        require!(amount.0 > 0, "Amount must be positive");
+        let yocto = micro_to_yocto(amount.0);
+        let locked = read_u128(&locked_key(&account));
+        require!(locked >= yocto, "Not enough locked");
+        let held = read_u128(&escrow_key(&account));
+        require!(held >= yocto, "Not enough escrow");
+        write_u128(&locked_key(&account), locked - yocto);
+        write_u128(&escrow_key(&account), held - yocto);
+        write_u128(b"pot1", read_u128(b"pot1") + yocto);
+    }
+
+    /// Pay a winner their stake back, plus extra NEAR taken from losing stakes.
+    pub fn payout(&mut self, account: AccountId, release_amount: U128, extra: U128) {
+        self.assert_owner();
+        if release_amount.0 > 0 {
+            let yocto = micro_to_yocto(release_amount.0);
+            let locked = read_u128(&locked_key(&account));
+            require!(locked >= yocto, "Not enough locked");
+            write_u128(&locked_key(&account), locked - yocto);
+            let next = self.balances.get(&account).copied().unwrap_or(0) + release_amount.0;
+            self.balances.insert(account.clone(), next);
+        }
+        if extra.0 > 0 {
+            let yocto = micro_to_yocto(extra.0);
+            let pot = read_u128(b"pot1");
+            require!(pot >= yocto, "Not enough pot");
+            write_u128(b"pot1", pot - yocto);
+            write_u128(&escrow_key(&account), read_u128(&escrow_key(&account)) + yocto);
+            let next = self.balances.get(&account).copied().unwrap_or(0) + extra.0;
+            self.balances.insert(account, next);
+        }
+    }
+
+    pub fn get_funds(&self, account: AccountId) -> Funds {
+        Funds {
+            balance: U128(self.balances.get(&account).copied().unwrap_or(0)),
+            escrow: U128(read_u128(&escrow_key(&account))),
+            locked: U128(read_u128(&locked_key(&account))),
+            pending: U128(read_u128(&pending_key(&account))),
+        }
+    }
 }
 
 impl Default for Pencils {
@@ -257,4 +400,47 @@ impl Pencils {
 
 fn pos_key(account: &AccountId, market_id: &str) -> String {
     format!("{account}:{market_id}")
+}
+
+const YOCTO_PER_MICRO: u128 = 1_000_000_000_000_000_000;
+
+fn micro_to_yocto(micro: u128) -> u128 {
+    micro.checked_mul(YOCTO_PER_MICRO).expect("Overflow")
+}
+
+fn escrow_key(account: &AccountId) -> Vec<u8> {
+    let mut key = b"esc1".to_vec();
+    key.extend(account.as_bytes());
+    key
+}
+
+fn locked_key(account: &AccountId) -> Vec<u8> {
+    let mut key = b"lck1".to_vec();
+    key.extend(account.as_bytes());
+    key
+}
+
+fn pending_key(account: &AccountId) -> Vec<u8> {
+    let mut key = b"pnd1".to_vec();
+    key.extend(account.as_bytes());
+    key
+}
+
+fn read_u128(key: &[u8]) -> u128 {
+    match env::storage_read(key) {
+        Some(bytes) if bytes.len() == 16 => {
+            let mut buf = [0u8; 16];
+            buf.copy_from_slice(&bytes);
+            u128::from_le_bytes(buf)
+        }
+        _ => 0,
+    }
+}
+
+fn write_u128(key: &[u8], value: u128) {
+    if value == 0 {
+        env::storage_remove(key);
+    } else {
+        env::storage_write(key, &value.to_le_bytes());
+    }
 }

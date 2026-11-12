@@ -17,11 +17,11 @@ Deadline for the application is 2026-11-14 23:59 UTC. A hosted demo can stay up 
 
 ## Idea
 
-Pencils is a consumer prediction market run by a swarm. Agents turn a live argument into a thesis with a number, a deadline, and a source. Humans and agents trade Yes and No. The price is the belief, and a one-line page tracks it until settlement.
+Pencils is a quotation desk run by a swarm. Agents turn a public source into one sentence with a number, a deadline, and a link. Ledger stands behind that sentence with two-sided book liquidity, and the number on the screen is the desk's quote. A person can take the other side. A one-line page tracks the quote until Quorum reads the source.
 
-The swarm is four roles with their own bankrolls. Pulse follows momentum, Ledger buys value and stakes into coalitions, Contra fades the crowd and opens a counter-market when a price gets one-sided, and Quorum checks the criteria and proposes a resolution after the deadline. A human has 24 hours to override. Winning shares pay a dollar. Coalition members share the fee only if the thesis resolves Yes.
+The desk is four roles. Pulse writes the sentence from X, Reddit, and the news. Ledger quotes it and funds both sides of the book from its own bank. Contra opens the other sentence only when that plan says the record splits. Quorum reads the named page after the deadline and leaves the sentence open when the page is unclear. A person has 24 hours to override. Desk banks are not withdrawable NEAR, and the quote does not decide the sentence.
 
-Each connected agent is a sub-account with a function-call policy: it can propose, or trade, only inside a spending limit the parent sets. Deposits quote a real NEAR Intents USDC route with dry set, so judges can see a cross-chain route without anyone spending funds. The same integer market math lives in a Rust NEAR contract. NEAR AI is optional and only rewrites the encyclopedia line. With no keys, `npm start` still runs the swarm.
+A user connects Meteor on NEAR testnet, deposits NEAR, and locks it to take a side of the quote. Refund sends unused NEAR back. A hosted agent is a function-call key on that same account, limited to lock, and it locks 1 NEAR only inside the spending limit when the quote is already far from even. Intents quotes stay dry and do not move USDC. The same integer book math lives in the Rust contract at pencilsbuzz.testnet. NEAR AI writes the desk plan and the one-line page. Humans cannot publish a sentence.
 
 ## What a judge should run
 
@@ -31,4 +31,4 @@ npm test
 npm start
 ```
 
-Then buy Yes on a market, connect an agent, and open Profile to fetch a dry Intents quote. `npm run simulate` shows a full coordination round, including resolution, without a model. `npm run contract` checks the same fill on the NEAR contract. Read RULES.md for the sequence.
+Then take Yes on a sentence, connect an agent, and open Profile to fetch a dry Intents quote. `npm run simulate` shows a quiet clock, one desk plan, and a source check, without a model. `npm run contract` checks the same fill on the NEAR contract. Read RULES.md for the sequence.

@@ -48,7 +48,21 @@ export function openStore(file) {
       user_id TEXT NOT NULL,
       expires INTEGER NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS near_txs (
+      hash TEXT PRIMARY KEY,
+      account_id TEXT NOT NULL,
+      method TEXT NOT NULL,
+      at INTEGER NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS agent_keys (
+      agent_id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      account_id TEXT NOT NULL,
+      public_key TEXT NOT NULL,
+      secret_key TEXT NOT NULL
+    );
   `);
+  dropDemoFunds();
   const cols = db.prepare("PRAGMA table_info(ai_calls)").all();
   if (!cols.some((c) => c.name === "kind")) {
     db.exec("ALTER TABLE ai_calls ADD COLUMN kind TEXT NOT NULL DEFAULT 'page'");
@@ -88,16 +102,35 @@ export function saveBook(book) {
 export function blankUser(now = Date.now()) {
   return {
     id: "u_" + randomBytes(9).toString("hex"),
-    balance: 250,
+    accountId: "",
+    balance: 0,
     positions: [],
     agents: [],
     notif: { ending: true, proposed: true, coalition: true, resolved: true },
     resolved: [],
-    resetAt: 0,
+    demoCleared: true,
     proposeHour: 0,
     proposeCount: 0,
     created: now,
   };
+}
+
+function dropDemoFunds() {
+  const rows = db.prepare("SELECT id, json FROM users").all();
+  for (const row of rows) {
+    const user = JSON.parse(row.json);
+    if (user.demoCleared) continue;
+    user.balance = 0;
+    user.positions = [];
+    user.resolved = [];
+    user.accountId = user.accountId || "";
+    for (const agent of user.agents || []) {
+      agent.spent = 0;
+      agent.live = false;
+    }
+    user.demoCleared = true;
+    db.prepare("UPDATE users SET json = ? WHERE id = ?").run(JSON.stringify(user), row.id);
+  }
 }
 
 export function insertUser(user, ip) {
@@ -138,6 +171,39 @@ export function userByToken(token) {
   if (!session || num(session.expires) < Date.now()) return null;
   const row = db.prepare("SELECT json FROM users WHERE id = ?").get(session.user_id);
   return row ? JSON.parse(row.json) : null;
+}
+
+export function userByAccount(accountId) {
+  if (!accountId) return null;
+  for (const user of listUsers()) {
+    if (user.accountId === accountId) return user;
+  }
+  return null;
+}
+
+export function claimNearTx(hash, accountId, method) {
+  const existing = db.prepare("SELECT hash FROM near_txs WHERE hash = ?").get(hash);
+  if (existing) throw new Error("That transaction was already used");
+  db.prepare("INSERT INTO near_txs (hash, account_id, method, at) VALUES (?, ?, ?, ?)").run(
+    hash,
+    accountId,
+    method,
+    Date.now(),
+  );
+}
+
+export function saveAgentKey({ agentId, userId, accountId, publicKey, secretKey }) {
+  db.prepare(
+    "INSERT INTO agent_keys (agent_id, user_id, account_id, public_key, secret_key) VALUES (?, ?, ?, ?, ?) ON CONFLICT(agent_id) DO UPDATE SET public_key = excluded.public_key, secret_key = excluded.secret_key, account_id = excluded.account_id",
+  ).run(agentId, userId, accountId, publicKey, secretKey);
+}
+
+export function agentKey(agentId) {
+  return db.prepare("SELECT agent_id, user_id, account_id, public_key, secret_key FROM agent_keys WHERE agent_id = ?").get(agentId) || null;
+}
+
+export function liveAgentKeys() {
+  return db.prepare("SELECT agent_id, user_id, account_id, public_key, secret_key FROM agent_keys").all();
 }
 
 export function userCount() {

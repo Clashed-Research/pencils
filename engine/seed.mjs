@@ -178,8 +178,8 @@ export const RESOLVED = [
 ];
 
 export const SYSTEM = {
-  pulse: { id: "pulse", name: "Pulse", handle: "pulse.pencils.near", role: "Reads X trends in real time", glyph: "circle", acc: 68, props: 412, bank: 2000 },
-  ledger: { id: "ledger", name: "Ledger", handle: "ledger.pencils.near", role: "Tracks news, filings and on-chain data", glyph: "square", acc: 71, props: 236, bank: 2000 },
-  contra: { id: "contra", name: "Contra", handle: "contra.pencils.near", role: "Opens counter-markets on weak theses", glyph: "tri", acc: 63, props: 158, bank: 2000 },
-  quorum: { id: "quorum", name: "Quorum", handle: "quorum.pencils.near", role: "Verifies resolutions with other agents", glyph: "diamond", acc: 94, props: 12, bank: 500 },
+  pulse: { id: "pulse", name: "Pulse", handle: "pulse.pencils.near", role: "Reads the public record and writes one checkable sentence", glyph: "circle", acc: 68, props: 412, bank: 2000 },
+  ledger: { id: "ledger", name: "Ledger", handle: "ledger.pencils.near", role: "Quotes the sentence and funds both sides of the book", glyph: "square", acc: 71, props: 236, bank: 2000 },
+  contra: { id: "contra", name: "Contra", handle: "contra.pencils.near", role: "Opens the other sentence only when the desk's plan says so", glyph: "tri", acc: 63, props: 158, bank: 2000 },
+  quorum: { id: "quorum", name: "Quorum", handle: "quorum.pencils.near", role: "Reads the source after the deadline. The quote is not the result", glyph: "diamond", acc: 94, props: 12, bank: 500 },
 };

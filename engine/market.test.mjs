@@ -43,7 +43,7 @@ test("agent spending limit blocks a trade and a coalition stake still clears", (
   const state = createState(now);
   const agent = connectAgent(state, { name: "Night Owl", kind: "near", now });
   assert.equal(agent.handle, "agent-1.pencilsbuzz.testnet");
-  assert.equal(agent.policy.methodNames.includes("buy"), true);
+  assert.equal(agent.policy.methodNames.includes("lock"), true);
   setPerm(state, { id: agent.id, perm: "trade", on: true });
   agent.limit = 10;
   bet(state, { marketId: "agents-word", side: "no", amount: 10, via: agent.id, now });
@@ -116,6 +116,53 @@ test("resolution pays each account its own shares", () => {
   assert.equal(a.resolved[0].won, true);
   assert.equal(b.resolved[0].won, false);
   assert.equal(state.balance, 250);
+});
+
+test("a solo near position returns the stake on either outcome", () => {
+  const now = 1_700_000_000_000;
+  const state = createState(now);
+  const user = { balance: 5, positions: [], agents: [], resolved: [], notif: {}, accountId: "ada.testnet" };
+  state.ledgers = [user];
+  withLedger(state, user, () => bet(state, { marketId: "launch-week", side: "yes", amount: 2, now, near: true, prepaid: true }));
+  assert.equal(user.balance, 5);
+  const m = state.markets.find((x) => x.id === "launch-week");
+  assert.equal(m.realYes, 2_000_000);
+  m.ends = now - 1;
+  proposeResolution(state, { marketId: "launch-week", outcome: "no", now });
+  finalize(state, { marketId: "launch-week", now: now + 25 * 60 * 60 * 1000 });
+  assert.equal(user.balance, 7);
+  assert.equal(user.positions.length, 0);
+  assert.equal(user.resolved[0].won, false);
+  assert.equal(user.resolved[0].pay, 2);
+  assert.equal(m.nearOps.length, 1);
+  assert.equal(m.nearOps[0].accountId, "ada.testnet");
+  assert.equal(m.nearOps[0].release, 2_000_000);
+  assert.equal(m.nearOps[0].slash, 0);
+  assert.equal(m.nearSettled, false);
+});
+
+test("near positions on both sides split the losing stake", () => {
+  const now = 1_700_000_000_000;
+  const state = createState(now);
+  const yes = { balance: 5, positions: [], agents: [], resolved: [], notif: {}, accountId: "yes.testnet" };
+  const no = { balance: 5, positions: [], agents: [], resolved: [], notif: {}, accountId: "no.testnet" };
+  state.ledgers = [yes, no];
+  withLedger(state, yes, () => bet(state, { marketId: "launch-week", side: "yes", amount: 2, now, near: true, prepaid: true }));
+  withLedger(state, no, () => bet(state, { marketId: "launch-week", side: "no", amount: 2, now, near: true, prepaid: true }));
+  const m = state.markets.find((x) => x.id === "launch-week");
+  m.ends = now - 1;
+  proposeResolution(state, { marketId: "launch-week", outcome: "yes", now });
+  finalize(state, { marketId: "launch-week", now: now + 25 * 60 * 60 * 1000 });
+  assert.equal(yes.balance, 9);
+  assert.equal(no.balance, 5);
+  assert.equal(yes.resolved[0].pay, 4);
+  assert.equal(no.resolved[0].pay, 0);
+  const yesOp = m.nearOps.find((op) => op.accountId === "yes.testnet");
+  const noOp = m.nearOps.find((op) => op.accountId === "no.testnet");
+  assert.equal(yesOp.release, 2_000_000);
+  assert.equal(yesOp.extra, 2_000_000);
+  assert.equal(noOp.slash, 2_000_000);
+  assert.equal(m.nearSettled, false);
 });
 
 test("swarm agents trade from their own bankroll", () => {
