@@ -5,8 +5,8 @@ const X_HANDLES = (process.env.PENCILS_X_HANDLES || "NEARProtocol,Reuters")
   .split(",")
   .map((s) => s.trim())
   .filter(Boolean);
-const REDDIT = "https://www.reddit.com/r/technology/hot/.rss";
-const NEWS = "https://feeds.bbci.co.uk/news/technology/rss.xml";
+const REDDIT = process.env.PENCILS_REDDIT_RSS || "https://www.reddit.com/r/technology/hot/.rss";
+const NEWS = process.env.PENCILS_NEWS_RSS || "https://feeds.bbci.co.uk/news/technology/rss.xml";
 
 let cache = { at: 0, posts: [] };
 

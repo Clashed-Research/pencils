@@ -615,7 +615,6 @@ setTimeout(() => {
 
 const bootAt = Date.now();
 let quorumBusy = false;
-let quorumUsed = false;
 
 function escHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -633,8 +632,8 @@ async function readPage(url) {
 
 // One source read per process, and never in the first 45 minutes after boot.
 async function quorumRound() {
-  if (quorumBusy || quorumUsed || !aiEnabled()) return;
-  if (Date.now() - bootAt < 45 * 60 * 1000) return;
+  if (quorumBusy || !aiEnabled()) return;
+  if (Date.now() - bootAt < Number(process.env.QUORUM_BOOT_MS || 60_000)) return;
   quorumBusy = true;
   try {
     const market = book.markets.find((m) => m.status === "open" && m.ends <= Date.now() && publicSourceUrl(m.feedUrl));
@@ -650,7 +649,6 @@ async function quorumRound() {
     if (page.length < 40) return;
     const slot = reserveAiCall(`quorum:${market.id}`);
     if (!slot.ok) return;
-    quorumUsed = true;
     console.log(`NEAR AI source read (${slot.used}/${slot.limit} today) for ${market.id}`);
     const text = await readSource({
       title: String(market.t || "").replace(/\[\[|\]\]/g, ""),
@@ -686,10 +684,11 @@ async function quorumRound() {
   }
 }
 
+const quorumMs = Math.max(60_000, Number(process.env.QUORUM_MS || 180_000));
 setTimeout(() => {
   quorumRound();
-  setInterval(quorumRound, 30 * 60 * 1000);
-}, 45 * 60 * 1000);
+  setInterval(quorumRound, quorumMs);
+}, Math.max(10_000, Number(process.env.QUORUM_BOOT_MS || 60_000)));
 
 process.on("SIGTERM", () => {
   try {
