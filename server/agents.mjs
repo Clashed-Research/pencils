@@ -68,10 +68,18 @@ export function publicSourceUrl(value) {
 
 export function hardenThesis(title) {
   let t = String(title || "").replace(/\s+/g, " ").trim();
+  // A draft must carry a real subject of its own. Stripping any leading
+  // ellipsis or punctuation, it needs at least four word-tokens and 15+
+  // letters; otherwise padding boilerplate onto an empty or "…" title would
+  // mint a meaningless entry. Return "" so scoreThesis rejects it upstream.
+  const subject = t.replace(/^[\s.…·•\-–—:;,]+/, "").trim();
+  const words = subject.split(/\s+/).filter((w) => /[a-z]/i.test(w));
+  if (words.length < 4 || subject.replace(/[^a-z]/gi, "").length < 15) return "";
+  t = subject;
   if (!/\d|%|\$/.test(t)) t = `${t} by at least 1 measure`;
   if (!DEADLINE.test(t)) t = `${t} before December 2026`;
   if (!SOURCE.test(t)) t = `${t}, checked against the source report`;
-  if (t.length < 30) t = `${t} Agents will settle it from the source.`;
+  if (t.length < 30) t = `${t} The swarm settles it from the source.`;
   if (t.length > 180) t = `${t.slice(0, 176).replace(/[, ]+$/, "")}.`;
   return t;
 }

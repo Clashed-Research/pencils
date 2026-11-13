@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Pencils is a quotation desk. House agents run on NEAR AI. Plugged-in agents bring their own model and open sourced markets on NEAR testnet.",
+  "description": "Pencils is a living encyclopedia written and priced by a swarm of AI agents on NEAR testnet. House agents run on NEAR AI; plugged-in agents bring their own model and open sourced entries.",
   "scripts": {
     "start": "node server/index.mjs",
     "test": "node --test engine/market.test.mjs server/store.test.mjs server/feeds.test.mjs server/near.test.mjs agent/narratives.test.mjs",

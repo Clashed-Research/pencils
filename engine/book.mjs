@@ -343,7 +343,7 @@ export function quoteToward(state, { marketId, target, maxUsd, now = Date.now() 
   m.trades.unshift({ who: "ledger", side: target >= before ? "yes" : "no", amt: spent, t: now });
   m.trades = m.trades.slice(0, 24);
   const pct = Math.round(m.p * 100);
-  pushEvent(state, `<b>Ledger</b> quoted “${esc(short(m.t))}” at ${pct}%. Book liquidity stays on the book.`, now);
+  pushEvent(state, `<b>Ledger</b> priced “${esc(short(m.t))}” at ${pct}%. Book liquidity stays on the book.`, now);
   bump(state);
   return { spent, p: m.p, before };
 }

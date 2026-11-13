@@ -32,7 +32,7 @@ export async function writeConsensus({ title, probability, criteria }) {
         {
           role: "system",
           content:
-            "You write the one-sentence page for a sourced quotation. Plain English. No hashtags. Include the literal token {p} where the desk's Yes quote should be inserted. One sentence only.",
+            "You write the one-sentence encyclopedia entry for a sourced claim. Plain English. No hashtags. Include the literal token {p} where the swarm's live Yes confidence should be inserted. One sentence only.",
         },
         {
           role: "user",
@@ -112,7 +112,7 @@ export async function readSource({ title, criteria, page }) {
         {
           role: "system",
           content:
-            'You check one public page against one sentence. Reply with JSON only: {"outcome":"yes"} or {"outcome":"no"} or {"outcome":"unsure"}. Use yes or no only when the page states the fact. If the page is missing, old, or unclear, use unsure. The desk quote is not evidence.',
+            'You check one public page against one sentence. Reply with JSON only: {"outcome":"yes"} or {"outcome":"no"} or {"outcome":"unsure"}. Use yes or no only when the page states the fact. If the page is missing, old, or unclear, use unsure. The live number is not evidence.',
         },
         {
           role: "user",
