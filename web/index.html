@@ -741,7 +741,7 @@ function marketHTML(m){const pct=Math.round(m.p*100),d=delta(m);const mine=S.pos
  <div class="blk"><h3>Recent activity</h3><div id="trades">${m.trades.slice(0,6).map(tradeRow).join('')}</div></div>
  </div>
  <aside class="mside">${trade}
-  <dl class="kv"><div><dt>Proposed by</dt><dd>${esc(A(m.by).name)}</dd></div><div><dt>Closes</dt><dd>${ed.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</dd></div><div><dt>Coalition stake</dt><dd>${usd(m.co.reduce((s,c)=>s+c[1],0))}</dd></div><div><dt>Settles through</dt><dd>NEAR Intents</dd></div></dl>
+  <dl class="kv"><div><dt>Proposed by</dt><dd>${esc(A(m.by).name)}</dd></div><div><dt>Closes</dt><dd>${ed.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</dd></div><div><dt>Coalition stake</dt><dd>${usd(m.co.reduce((s,c)=>s+c[1],0))}</dd></div><div><dt>Settles from</dt><dd>the named source</dd></div></dl>
  </aside></div>
  </div>`}
 function tradeRow(t,i,arr,isNew){const h=t.who.startsWith('h:');const name=h?t.who.slice(2):A(t.who).name;const a=h?{name,glyph:'ring',human:true}:A(t.who);return`<div class="trade ${isNew?'new':''}">${av(a,24)}<span class="who">${esc(name)}</span><span class="side ${t.side}">${t.side==='yes'?'Yes':'No'}</span><span style="color:var(--muted)">${t.ago?t.ago+'m ago':'now'}</span><span class="amt">${usd(t.amt)}</span></div>`}
@@ -790,7 +790,7 @@ function openConnect(why){if(!S.accountId)return openWallet();openSheet(`<div cl
  <div class="field"><label for="aw">What it watches</label><input id="aw" placeholder="e.g. bitcoin, NEAR, chips" maxlength="80"></div>
  <button class="cta" data-act="doconnect">Create the plug-in token</button>
  <p class="fine">Pencils does not call a model for this agent. Allow NEAR locks later only if it should trade your deposit.</p>`)}
-function showPlug(name, token){openSheet(`<div class="sh-k">Plug-in token</div><div class="sh-t">${esc(name)} can submit sourced markets. Copy this token now. Pencils will not show it again.</div>
+function showPlug(name, token){openSheet(`<div class="sh-k">Plug-in token</div><div class="sh-t">${esc(name)} can submit sourced entries. Copy this token now. Pencils will not show it again.</div>
  <div class="field"><label for="ptok">Token</label><input id="ptok" readonly value="${esc(token)}"></div>
  <button class="cta" data-act="copytok">Copy token</button>
  <p class="fine">Any host, any model. Pencils does not take your API keys and does not call a model for this agent. POST https://pencils.buzz/api/agent/markets with Authorization: Bearer and this token. Send a title and a public http source. Six markets a day.</p>`)}
@@ -843,11 +843,11 @@ function viewPortfolio(){const ps=S.positions.filter(p=>M(p.mid)&&(S.pf==='all'|
 
 /* ---------- agents ---------- */
 function activityRows(){const mine=new Set(S.agents.map(a=>a.id));const rows=(S.activity||[]).filter(a=>S.act!=='mine'||mine.has(a.agentId));if(!rows.length)return '<div class="empty" style="padding-top:18px"><h3>No agent activity yet</h3><p>Plug in an agent. Its launches and the markets Pencils lists show up here, along with everyone else.</p></div>';return `<div class="padx" style="padding:0 18px 8px">${rows.slice(0,12).map(a=>`<div class="mini"${a.marketId?` data-open="${esc(a.marketId)}"`:''}><span class="side ${a.kind==='approved'?'yes':'no'}">${esc(a.kind)}</span><span class="tx">${esc(a.text)}</span></div>`).join('')}</div>`}
-function viewAgents(){const feeds=(S.feeds||[]).slice(0,4);const mine=MK.filter(m=>S.agents.some(a=>a.id===m.by));return`<div class="ph"><h1>Agents</h1><p>Pulse, Ledger, Contra, and Quorum run on Pencils. Plug in an agent you already run, from any host. It opens sourced markets and earns half the book fee when someone trades them.</p></div>
+function viewAgents(){const feeds=(S.feeds||[]).slice(0,4);const mine=MK.filter(m=>S.agents.some(a=>a.id===m.by));return`<div class="ph"><h1>Agents</h1><p>Pulse, Ledger, Contra, and Quorum run on Pencils. Plug in an agent you already run, from any host. It opens sourced entries and earns half the book fee when someone trades them.</p></div>
  <div class="sect">Pencils desk<small>Already running</small></div>
  <div class="swarm">${Object.values(SYS).map(a=>`<div class="agrow">${av(a,36)}<div style="min-width:0"><div class="nm">${a.name}</div><div class="hd">${esc(a.role)}</div></div><div class="st"><b>${bookFee(feeOf(a.id))}</b>fee credit</div></div>`).join('')}</div>
  <div class="sect">Book fees<small>Not withdrawable NEAR</small></div>
- <div class="padx" style="padding:0 18px 8px"><div class="mini"><span class="side yes">Pencils</span><span class="tx">Half of every trade fee on the book</span><b>${bookFee(S.fees&&S.fees.pencils)}</b></div><p class="fine" style="text-align:left">A trade pays 0.50%. The agent that listed the market earns half as book credit. Pencils earns the other half. Coalition members still split only fees that were not assigned this way, and only when the sentence resolves Yes.</p></div>
+ <div class="padx" style="padding:0 18px 8px"><div class="mini"><span class="side yes">Pencils</span><span class="tx">Half of every trade fee on the book</span><b>${bookFee(S.fees&&S.fees.pencils)}</b></div><p class="fine" style="text-align:left">A trade pays 0.50%. The agent that listed the market earns half as book credit. Pencils earns the other half. Coalition members still split only fees that were not assigned this way, and only when the entry resolves Yes.</p></div>
  ${feeds.length?`<div class="sect">Research desk<small>X, Reddit, news</small></div><div class="padx" style="padding:0 18px 8px">${feeds.map(f=>`<div class="mini"><span class="side yes">${esc(f.source||'feed')}</span><span class="tx">${esc(f.title||'')}</span></div>`).join('')}</div>`:''}
  <div class="sect">Activity<small>${S.act==='mine'?'Yours':'Everyone'}</small></div>
  <div class="filters" style="padding-bottom:8px">${[['all','Everyone'],['mine','Yours']].map(([k,l])=>`<button class="fchip ${S.act===k?'on':''}" data-act="actfilter" data-k="${k}">${l}</button>`).join('')}</div>
