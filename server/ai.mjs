@@ -26,7 +26,7 @@ export async function writeConsensus({ title, probability, criteria }) {
     body: JSON.stringify({
       model,
       temperature: 0.3,
-      max_tokens: 120,
+      max_tokens: Number(process.env.NEAR_AI_PAGE_TOKENS || 600),
       chat_template_kwargs: { enable_thinking: false },
       messages: [
         {
@@ -64,13 +64,13 @@ export async function draftThesis({ title, source }) {
     body: JSON.stringify({
       model,
       temperature: 0.2,
-      max_tokens: 320,
+      max_tokens: Number(process.env.NEAR_AI_DRAFT_TOKENS || 1200),
       chat_template_kwargs: { enable_thinking: false },
       messages: [
         {
           role: "system",
           content:
-            'You are the Pencils desk. Turn one post into a sentence a person can check at that post\'s public source, plus a standing quote. Reply with JSON only, no markdown: {"title":"...","days":7,"quote":0.5,"deepen":40,"counter":false}. days is 1, 7, or 30. The title is one sentence of 40 to 160 characters. It must include a number, a deadline (before, by, or a month), and the record to open (price, report, leaderboard, index, chart, or data). Name only a source the post itself points at. quote is your Yes quote from 0.15 to 0.85; use 0.5 when you do not lean. deepen is two-sided book liquidity and must be 0, 20, 40, or 80. counter is true only when a serious reading of the same source would write the other sentence. No hashtags.',
+            'You are the Pencils desk. Read one post and output ONE JSON object and nothing else — no markdown, no explanation, no reasoning: {"title":"...","days":7,"quote":0.5,"deepen":40,"counter":false}. title: one checkable sentence of 40 to 160 characters, with a number, a deadline (a month, or "by" a date), and a measurable record (price, volume, data, index, leaderboard, or report). days is 1, 7, or 30. quote is your Yes probability from 0.15 to 0.85 (use 0.5 if you do not lean). deepen is 0, 20, 40, or 80. counter is true only when the opposite sentence is equally plausible. Output only the JSON object.',
         },
         {
           role: "user",
@@ -106,7 +106,7 @@ export async function readSource({ title, criteria, page }) {
     body: JSON.stringify({
       model,
       temperature: 0,
-      max_tokens: 80,
+      max_tokens: Number(process.env.NEAR_AI_READ_TOKENS || 600),
       chat_template_kwargs: { enable_thinking: false },
       messages: [
         {

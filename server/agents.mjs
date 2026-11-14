@@ -11,38 +11,59 @@ function deskQuote(n) {
   return null;
 }
 
-export function parseDraft(text) {
-  const raw = String(text || "");
-  const start = raw.indexOf("{");
-  const end = raw.lastIndexOf("}");
-  if (start < 0 || end <= start) return null;
-  let json;
-  try {
-    json = JSON.parse(raw.slice(start, end + 1));
-  } catch {
-    return null;
+// Reasoning models emit their chain of thought and may echo the prompt's
+// example JSON. Yield balanced {...} objects from the end of the text so the
+// caller can take the model's final answer, not an echoed placeholder.
+function* jsonObjects(raw) {
+  const s = String(raw || "");
+  let depth = 0;
+  let end = -1;
+  for (let i = s.length - 1; i >= 0; i--) {
+    const c = s[i];
+    if (c === "}") {
+      if (depth === 0) end = i;
+      depth += 1;
+    } else if (c === "{" && depth > 0) {
+      depth -= 1;
+      if (depth === 0 && end >= 0) {
+        yield s.slice(i, end + 1);
+        end = -1;
+      }
+    }
   }
+}
+
+function lastValidJson(raw, ok) {
+  for (const chunk of jsonObjects(raw)) {
+    let obj;
+    try {
+      obj = JSON.parse(chunk);
+    } catch {
+      continue;
+    }
+    if (ok(obj)) return obj;
+  }
+  return null;
+}
+
+function realTitle(value) {
+  return String(value || "").replace(/[.\s…·•\-–—:;,]/g, "").length > 0;
+}
+
+export function parseDraft(text) {
+  const json = lastValidJson(text, (o) => o && typeof o.title === "string" && realTitle(o.title));
+  if (!json) return null;
   const title = String(json.title || "").replace(/\s+/g, " ").trim();
-  const days = [1, 7, 30].includes(Number(json.days)) ? Number(json.days) : 7;
   if (!title) return null;
+  const days = [1, 7, 30].includes(Number(json.days)) ? Number(json.days) : 7;
   const deepen = [20, 40, 80].includes(Number(json.deepen)) ? Number(json.deepen) : 0;
   const counter = json.counter === true || json.counter === "true";
   return { title, days, quote: deskQuote(json.quote), deepen, counter };
 }
 
 export function parseVerdict(text) {
-  const raw = String(text || "");
-  const start = raw.indexOf("{");
-  const end = raw.lastIndexOf("}");
-  if (start < 0 || end <= start) return "unsure";
-  try {
-    const json = JSON.parse(raw.slice(start, end + 1));
-    const outcome = String(json.outcome || "").toLowerCase();
-    if (outcome === "yes" || outcome === "no" || outcome === "unsure") return outcome;
-  } catch {
-    return "unsure";
-  }
-  return "unsure";
+  const json = lastValidJson(text, (o) => o && ["yes", "no", "unsure"].includes(String(o.outcome || "").toLowerCase()));
+  return json ? String(json.outcome).toLowerCase() : "unsure";
 }
 
 export function publicSourceUrl(value) {
