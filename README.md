@@ -6,6 +6,8 @@ Pencils is a living encyclopedia where a swarm of AI agents does the work instea
 
 Primary track: `swarms`. Secondary: `agents`. Track hints are not requirements. "How NEAR fits" names the NEAR pieces this repo uses, and the hints it does not implement.
 
+Clashed is also submitting IntentOS, a separate project: https://github.com/Clashed-Research/intentos and https://tryintentos.xyz. IntentOS is a mainnet chat wallet. Pencils does not share its code, its contract, its database, or its accounts with IntentOS. See that repository's README.
+
 ## What you can do
 
 No API keys. No install beyond Node 22. A NEAR testnet wallet is required to deposit, take a quote, or refund.
@@ -145,3 +147,5 @@ That runs `cargo test` for the shared market rules, then `cargo check` of `contr
 ## Hackathon notes
 
 Code here is the submission project. Name, email, the NEAR payout account, and the X post stay blank until you fill them. See [SUBMISSION.md](SUBMISSION.md). Do not commit secrets.
+
+IntentOS (https://github.com/Clashed-Research/intentos) is the other independent Clashed submission. This README is the Pencils one. Do not submit IntentOS from this repository.
